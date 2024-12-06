@@ -1,0 +1,241 @@
+{% macro tskin_panel(config) %}
+<div class="d-flex justify-content-between align-items-center gap-3">
+    <div class="d-flex gap-3 align-items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" class="bi bi-tskin align-self-center text-light"
+            viewBox="0 0 40 40">
+            <path fill="#000" fill-rule="evenodd" clip-rule="evenodd"
+                d="M0.765806 12.4697C5.3185 11.1389 14.901 9 24.3289 9C37.159 9 40 12.4225 40 20.7885C40 28.6791 40 30.9608 34.6414 30.9608H6.91656C1.96779 30.9608 -1.1481 19.6477 12.6901 19.6477H32.027C36.5175 19.6477 36.6092 13.3731 32.4852 12.2323C28.4499 11.116 16.0789 10.5459 1.38217 14.6189C0.833908 14.7709 0.260099 14.4671 0.0661623 13.9138C-0.145839 13.309 0.168707 12.6443 0.765806 12.4697ZM38.1239 25.732L4.94877 25.732V26.3024C4.94877 27.8776 6.17968 29.1545 7.69809 29.1545L35.3745 29.1545C36.8929 29.1545 38.1239 27.8776 38.1239 26.3024V25.732Z"
+                fill="#121212"></path>
+        </svg>
+        <h6 class="mb-0 text-uppercase">{{ config.name }}</h6>
+        <!--<small class="mb-0 opacity-75">{{ config.address }}</small>-->
+        <i class="bi bi-bluetooth align-self-center" style="font-size: 24px; color: #0d6efd"></i>
+        {# <div>
+            <button type="button" class="btn btn-link text-light" {% if not connected %} disabled {% endif %}>
+                <i class="bi bi-three-dots-vertical"></i>
+            </button>
+        </div> #}
+    </div>
+
+    <img src="{{ url_for('static', filename='images/' + config.hand.value + '-hand.svg') }}" height="45">
+
+    <button type="button" class="btn btn-link tskin float-end" data-bs-toggle="modal"
+        data-bs-target="#removetskinmodal_{{config.hand.value}}">
+        <i class="bi bi-x-circle" style="font-size: 24px;"></i>
+    </button>
+
+    <!--
+        <div class="btn-group-vertical">
+            <button type="button" class="btn {% if hand == 'left' %} btn-primary {% else %} btn-outline-primary {% endif %}" {% if not connected %} disabled {% endif %}>
+                <img src="{{ url_for('static', filename='images/left_stroke.png') }}" alt="twbs" width="24" height="24">
+            </button>
+            <button type="button" class="btn {% if hand == 'right' %} btn-primary {% else %} btn-outline-primary {% endif %}" {% if not connected %} disabled {% endif %}>
+                <img src="{{ url_for('static', filename='images/right_stroke.png') }}" alt="twbs" width="24" height="24">
+            </button>
+        </div>
+        -->
+</div>
+{% endmacro %}
+
+{% macro tskin_management(config) %}
+<div class="modal fade" id="removetskinmodal_{{config.hand.value}}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content text-dark">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Tactigon skin {{config.hand.value}}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body d-flex flex-column gap-3">
+                <h4>Warning!</h4>
+                You are about to remove {{ config.name }}. Are you sure?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="{{ url_for('tskin.remove', hand=config.hand.value)}}" class="btn btn-primary">
+                    Remove
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endmacro%}
+
+{% macro side_panel_right() %}
+{% if tskin_config %}
+{{ tskin_management(tskin_config) }}
+{% endif %}
+
+<div class="offcanvas offcanvas-end" id="panel_device_connection" data-bs-scroll="true" data-bs-backdrop="false"
+    tabindex="-1">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasScrollingLabel">Device connection</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <hr>
+        <div class="d-flex flex-column gap-3">
+            {% if tskin_config %}
+            {{ tskin_panel(tskin_config) }}
+            {% endif %}
+
+            {#
+            <a href="{{ url_for('tskin.add') }}" class="btn btn-light gap-3">
+                <i class="bi bi-plus"></i>
+                Add
+            </a>
+            #}
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+{% macro popup_message(messages) %}
+<div class="toast-container end-0 p-3">
+    {% for category, message in messages %}
+    <div class="toast {{ category }}" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-primary bg-{{ category }} bg-opacity-50">
+            <strong class="me-auto">
+                {% if category == 'success' %}
+                Success
+                {% elif category == 'warning' %}
+                Warning
+                {% elif category == 'danger' %}
+                Error
+                {% else %}
+                Info
+                {% endif %}
+            </strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            {{ message }}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endmacro %}
+
+{% macro tskin(config) %}
+<div id="tskin-management" class="d-flex gap-3 m-2">
+    <div class="d-flex gap-1">
+        <img src="{{ url_for('static', filename='images/' + config.hand.value + '.png') }}" alt="twbs" width="20" height="20">
+        <small>{{ config.hand.value[0].upper() }}</small>
+    </div>
+    <div class="d-flex gap-1">
+        <img src="{{ url_for('static', filename='images/tactigon.png') }}" alt="twbs" width="20" height="20">
+        <small>{{ config.name.upper() }}</small>
+    </div>
+    <div class="d-flex gap-1">
+        <i class="mi-round mi-bluetooth-connected connected d-none" style="font-size: 20px; color: #fff"></i>
+        <i class="mi-round mi-bluetooth disconnected d-none" style="font-size: 20px; color: gray"></i>
+    </div>
+    <div class="d-flex gap-1 battery-container d-none">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="align-self-center"
+            viewBox="0 0 16 16">
+            <path id="battery-perc" d="M2 6h0v4H2z" />
+            <path
+                d="M2 4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm10 1a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm4 3a1.5 1.5 0 0 1-1.5 1.5v-3A1.5 1.5 0 0 1 16 8" />
+        </svg>
+        <small class="align-self-center" id="battery-voltage"></small>
+    </div>
+</div>
+{% endmacro %}
+
+{% macro braccio(config) %}
+<div id="braccio-management" class="d-flex gap-3 m-2">
+    <div class="gap-1">
+        <i class="mi-round mi-precision-manufacturing" style="font-size: 20px;"></i>
+        <small>{{ config.name }}</small>
+    </div>
+    <div>
+        <i class="mi-round mi-bluetooth-connected connected d-none" style="font-size: 20px; color: #fff;"></i>
+        <i class="mi-round mi-bluetooth disconnected" style="font-size: 20px; color: gray;"></i>
+    </div>
+</div>
+{% endmacro %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tactigon Shapes</title>
+    <link rel="shortcut icon" href="{{ url_for('favicon') }}">
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/bootstrap-icons.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/material-icons.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
+    {% block style %}
+    {% endblock %}
+</head>
+
+<body class="">
+    <!--- Loader --->
+    <div class="d-flex" id="loading_spinner">
+        <div class="d-flex flex-fill justify-content-center align-self-center">
+            <div class="spinner-border spinner-lg tskin" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
+    <!--- Navbar TSKIN status -->
+    <div class="sticky-top">
+        <nav class="bg-dark text-light">
+            <div class="container-fluid d-flex justify-content-end align-items-center gap-3">
+                {% if braccio_config %}
+                    {{ braccio(braccio_config) }}
+                {% endif %}
+                {% if tskin_config %}
+                    {{tskin(tskin_config)}}
+                {% endif %}
+            </div>
+        </nav>
+        <!--- Navbar app -->
+        <nav class="navbar bg-tskin">
+            <div class="container-fluid">
+                <a href="{{ url_for('main.index') }}" class="btn btn-link text-decoration-none text-light" title="Homepage">
+                    <i class="mi-round mi-home" style="font-size: 24px"></i>
+                </a>
+                <div>
+                    <a href="{{ url_for('shapes.index') }}" class="btn btn-link text-decoration-none text-light" title="Shapes">
+                        <i class="mi-round mi-extension" style="font-size: 24px"></i>
+                    </a>
+                    {% if has_braccio %}
+                        <a href="{{ url_for('braccio.index') }}" class="btn btn-link text-decoration-none text-light" title="Braccio">
+                            <i class="mi-round mi-precision-manufacturing" style="font-size: 24px"></i>
+                        </a>
+                    {% endif %}
+                    <button class="btn btn-link text-decoration-none text-light" title="Device status"
+                        data-bs-toggle="offcanvas" data-bs-target="#panel_device_connection"
+                        aria-controls="offcanvasScrolling">
+                        <i class="mi-round mi-bluetooth" style="font-size: 24px"></i>
+                    </button>
+                    <a href="{{ url_for('main.settings') }}" class="btn btn-link text-decoration-none text-light" title="Settings">
+                        <i class="mi-round mi-settings" style="font-size: 24px"></i>
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    {{ side_panel_right() }}
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {{ popup_message(messages) }}
+    {% endwith %}
+
+    <main>
+        {% block body %}{% endblock %}
+    </main>
+
+    <script src="{{url_for('static', filename='js/jquery-3.6.3.min.js')}}"></script>
+    <script src="{{url_for('static', filename='js/bootstrap.bundle.min.js')}}"></script>
+    <script src="{{url_for('static', filename='js/socket.io-4.7.2.min.js')}}"></script>
+    <script src="{{url_for('static', filename='js/svg.min.js')}}"></script>
+    <script src="{{url_for('static', filename='js/main.js')}}"></script>
+    {% block script %}{% endblock %}
+</body>
+
+</html>

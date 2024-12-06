@@ -1,0 +1,34 @@
+[
+  {
+    "id": "3bbc7b4a2aeb4cc2a4e7efe7517a78c3",
+    "name": "Powerpoint",
+    "created_on": "2024-07-23T10:58:08.563701",
+    "modified_on": "2024-12-06T16:44:35.746371",
+    "description": "",
+    "readonly": true
+  },
+  {
+    "id": "b195acffd6fe41b699ac0107298d8008",
+    "name": "Braccio Gesture&Touch",
+    "created_on": "2024-09-12T14:45:45.568267",
+    "modified_on": "2024-12-06T16:44:39.219492",
+    "description": "",
+    "readonly": true
+  },
+  {
+    "id": "7eda6f5bc0a14abc9df6c114ce50b975",
+    "name": "Braccio movement",
+    "created_on": "2024-09-12T15:00:18.895327",
+    "modified_on": "2024-12-06T16:44:42.607442",
+    "description": "",
+    "readonly": true
+  },
+  {
+    "id": "a1b39bce15794249bff6bda490b91152",
+    "name": "Braccio drive",
+    "created_on": "2024-09-12T15:15:01.759547",
+    "modified_on": "2024-12-06T16:44:46.144385",
+    "description": "",
+    "readonly": true
+  }
+]

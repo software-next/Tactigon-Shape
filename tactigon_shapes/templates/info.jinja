@@ -1,0 +1,30 @@
+{% extends "settings.jinja" %}
+
+{% block settings %}
+    <div class="container p-3">
+        <div class="card m-auto w-50">
+            <div class="card-body">
+                <div class="d-flex flex-column align-content-center text-center gap-3">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" class="mx-auto d-block my-4" height="80px" width="80px">
+                    <p class="h3">Tactigon Shapes</p>
+                    <p>Version: {{ version }}</p>
+                    {% if tskin_config %}
+                        <p class="h3">Tactigon Skin</p>
+                        <p class="mx-auto text-start">
+                            Name: {{ tskin_config.name }}<br/>
+                            Bluetooth: {{ tskin_config.address }}<br/>
+                            Hand: {{ tskin_config.hand.name }}<br/>
+                            Model: {{ tskin_config.gesture_config.name}}<br/>
+                            Firmware: v5.0.3<br/>
+                            Tactigon Gear: v{{ tactigon_gear }}<br/>
+                            {% if tactigon_speech %}
+                                Tactigon Speech: v{{ tactigon_speech }}
+                            {% endif %}
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+{% endblock settings %}
