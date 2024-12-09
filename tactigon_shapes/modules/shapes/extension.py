@@ -15,10 +15,10 @@ from flask import Flask
 from pynput.keyboard import Controller as KeyboardController
 
 from ..braccio.extension import BraccioInterface, Wrist, Gripper
+from ..tskin.models import ModelGesture, TSkin, OneFingerGesture, TwoFingerGesture, TSpeechObject
+from ..tskin.manager import walk
 
 from ...extensions.base import ExtensionThread, ExtensionApp
-from ...models import ModelGesture, TSkin, OneFingerGesture, TwoFingerGesture, TSpeechObject
-from ...utils.speech import walk
 
 class Severity(Enum):
     DEBUG = 0

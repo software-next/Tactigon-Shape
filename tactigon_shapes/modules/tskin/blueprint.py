@@ -7,15 +7,10 @@ from flask import Blueprint, render_template, redirect, url_for, request, flash,
 from typing import Optional
 
 from .manager import start_tskin, load_tskin, stop_tskin, get_tskin
+from .models import TSkinModel, VoiceConfig, TSkinConfig, Hand, GestureConfig, TSpeechObject, TSpeech, HotWord
 
 from ..socketio import get_socket_app
-
 from ...config import app_config
-from ...models import BASE_PATH, TSkinModel, VoiceConfig, TSkinConfig, Hand, GestureConfig
-
-if sys.platform != "darwin":
-    from ...models import TSpeechObject, TSpeech, HotWord
-
 from ...utils.extensions import stop_apps
 from ...utils.request_utils import get_from_request
 
@@ -147,8 +142,8 @@ def save():
         # return redirect(url_for("tskin.add"))
     
     gesture_config = GestureConfig(
-        path.join(BASE_PATH, "models", current_model.name, "model.pickle"),
-        path.join(BASE_PATH, "models", current_model.name, "encoder.pickle"),
+        path.join("models", current_model.name, "model.pickle"),
+        path.join("models", current_model.name, "encoder.pickle"),
         current_model.name,
         current_model.date,
         [g.gesture for g in current_model.gestures]
@@ -163,40 +158,19 @@ def save():
 
     if sys.platform != "darwin":
         voice_config = VoiceConfig(
-            path.join(BASE_PATH, "speech", "deepspeech-0.9.3-models.tflite"),
-            path.join(BASE_PATH, "speech", "tos.scorer"),
+            path.join("speech", "deepspeech-0.9.3-models.tflite"),
+            path.join("speech", "tos.scorer"),
             vad_padding_ms=800,
             vad_frame=20,
             voice_timeout=3,
             silence_timeout=3,
-            voice_commands_notification=path.join(BASE_PATH, "config", "audio", "trigger.wav"),
             voice_commands=TSpeechObject(
                 [
-                    TSpeech(
-                        [HotWord("start"), HotWord("stop")],
-                        TSpeechObject(
-                            [
-                                TSpeech(
-                                    [HotWord("application"), HotWord("program")],
-                                ),
-                                TSpeech(
-                                    [HotWord("voice"), HotWord("gesture"), HotWord("touch")],
-                                    TSpeechObject(
-                                        [
-                                            TSpeech(
-                                                [HotWord("tutorial")],
-                                            )
-                                        ]
-                                    )
-                                )
-                            ]
-                        )
-                    ),
                     TSpeech(
                         [HotWord("enter"), HotWord("exit")],
                         TSpeechObject(
                             [
-                                TSpeech([HotWord("application"), HotWord("program")])
+                                TSpeech([HotWord("application")])
                             ]
                         )
                     ),

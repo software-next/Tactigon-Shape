@@ -8,10 +8,12 @@ from flask import Blueprint, render_template, flash, redirect, url_for
 from .extension import ShapeConfig, Program
 from .utils import get_shapes_app
 
+from ..tskin.manager import get_tskin
+
 from ...config import app_config, check_config
 from ...models import ModelGesture
 from ...utils.request_utils import get_from_request, check_empty_inputs
-from ...utils.tskin_manager import get_tskin
+
 
 bp = Blueprint("shapes", __name__, url_prefix="/shapes", template_folder="templates", static_folder="static")
 

@@ -21,8 +21,7 @@ from .modules.socketio import SocketApp
 from .modules.braccio.extension import BraccioInterface
 from .modules.braccio.utils import get_braccio_interface
 from .modules.shapes.extension import ShapesApp
-
-from .utils.tskin_manager import load_tskin, start_tskin, TSKIN_EXTENSION
+from .modules.tskin.manager import load_tskin, start_tskin, TSKIN_EXTENSION
 
 class Server(Process):
     url: str

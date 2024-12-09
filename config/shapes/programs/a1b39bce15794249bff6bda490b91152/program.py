@@ -11,7 +11,7 @@ from datetime import datetime
 from queue import Queue
 from tactigon_shapes.modules.shapes.extension import ShapesPostAction
 from tactigon_shapes.modules.braccio.extension import BraccioInterface, CommandStatus, Wrist, Gripper
-from tactigon_shapes.models import TSkin, OneFingerGesture, TwoFingerGesture, HotWord, TSpeechObject, TSpeech
+from tactigon_shapes.modules.tskin.models import TSkin, OneFingerGesture, TwoFingerGesture, HotWord, TSpeechObject, TSpeech
 from pynput.keyboard import Controller as KeyboardController, HotKey, KeyCode
 from typing import List, Optional
 

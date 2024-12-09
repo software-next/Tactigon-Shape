@@ -8,7 +8,7 @@ from typing import Optional
 from ..braccio.extension import BraccioInterface
 from ..shapes.extension import ShapesApp
 
-from ...models import TSkin
+from ..tskin.models import TSkin
 
 class SocketApp(SocketIO):
     name: str = "socket_app"

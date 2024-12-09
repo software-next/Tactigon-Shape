@@ -6,7 +6,8 @@ from . import __version__
 from .config import check_config
 from .modules.socketio import get_socket_app
 from .utils.extensions import stop_apps
-from .utils.tskin_manager import stop_tskin
+
+from .modules.tskin.manager import stop_tskin
 
 bp = Blueprint('main', __name__, template_folder="main")
 
