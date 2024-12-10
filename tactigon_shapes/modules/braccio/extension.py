@@ -14,7 +14,7 @@ from .middleware import Solver
 from .models import BraccioConfig, BraccioCommand, BraccioPosition, CommandStatus, Wrist, Gripper
 
 class Braccio(Thread):
-    _TICK: float = 0.02
+    _TICK: float = 0.1
     CMD: str = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
     STATUS: str = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
 
@@ -275,7 +275,8 @@ class BraccioInterface:
         if self.config:
             self._thread = Braccio(self.config)
             self._thread.start()
-
+            self.move(0, 100, 100)
+            
     def wrist(self, wrist: Wrist):
         if self._thread:
             return self._thread.wrist(wrist)

@@ -1,13 +1,14 @@
 import sys
+from os import path
 from flask import current_app
 from typing import Optional, Union
 
-from .models import TSkin, TSkinConfig, VoiceConfig, Hand, TSpeech
+from .models import TSkin, TSkinConfig, GestureConfig, TSkinModel, VoiceConfig, Hand, TSpeech, TSpeechObject, HotWord
 
 TSKIN_EXTENSION = "tskin"
 
 def load_tskin(config: TSkinConfig, voice: Optional[VoiceConfig]):
-    current_app.extensions[TSKIN_EXTENSION] = TSkin(config, voice)
+    current_app.extensions[TSKIN_EXTENSION] = TSkin(config, voice, True)
 
 def start_tskin():
     tskin = get_tskin()
@@ -20,7 +21,7 @@ def stop_tskin():
     tskin = get_tskin()
 
     if tskin:
-        tskin.join(1.0)
+        tskin.terminate()
 
     reset_tskin()
 
@@ -33,6 +34,20 @@ def get_tskin() -> Optional[TSkin]:
 
 def reset_tskin():
     current_app.extensions[TSKIN_EXTENSION] = None
+
+def get_tskin_default_config(address: str, hand: Hand, name: str, model: TSkinModel):
+    return TSkinConfig(
+        address,
+        hand,
+        name,
+        GestureConfig(
+            path.join("models", model.name, "model.pickle"),
+            path.join("models", model.name, "encoder.pickle"),
+            model.name,
+            model.date,
+            [g.gesture for g in model.gestures]
+        )
+    )
 
 if sys.platform == "win32":
     def walk(args, s: TSpeech, level: int = 0, parent: str = "_init_"):
@@ -49,58 +64,36 @@ if sys.platform == "win32":
                 for child in s.children.t_speech:
                     walk(args, child, level + 1, hw.word)
 
-    # def get_next_remaining_branch(tree: Optional[List[HotWords]], *levels) -> List[HotWord]:  
-    #     if tree is None:
-    #         return []
-        
-    #     if not levels:
-    #         return [branch[0] for branch in tree]
-        
-    #     current_level, *rest = levels
-    #     try:
-    #         current_obj = [b[0] for b in tree[current_level][1]]
-    #     except:
-    #         return []
-        
-    #     if len(rest) == 0:
-    #         return current_obj
-        
-    #     next_tree = tree[current_level][1]
-
-    #     return (get_next_remaining_branch(next_tree, *rest))
-
-    # def get_hotword_from_tree(tree: Optional[List[HotWords]], *levels) -> List[HotWord]:
-    #     if not tree:
-    #         return []
-        
-    #     if not levels:
-    #         return [branch[0] for branch in tree]
-        
-    #     current_level, *rest = levels
-    #     current_obj = tree[current_level][0]
-        
-    #     if len(rest) == 0:
-    #         return [current_obj]
-        
-    #     next_tree = tree[current_level][1]
-
-    #     return [current_obj] + (get_hotword_from_tree(next_tree, *rest))
-
-    # def tspeech_combinations(tspeech: Optional[TSpeechObject]) -> Optional[List[HotWords]]:  
-    #     if not tspeech:
-    #         return None
-        
-    #     return [(hw, tspeech_combinations(ts.children)) for ts in tspeech.t_speech for hw in ts.hotwords]
+    def get_voice_default_config() -> Optional[VoiceConfig]:
+        return VoiceConfig(
+            path.join("speech", "deepspeech-0.9.3-models.tflite"),
+            path.join("speech", "shapes.scorer"),
+            voice_timeout=3,
+            silence_timeout=3,
+            voice_commands=TSpeechObject(
+                [
+                    TSpeech(
+                        [HotWord("pick"), HotWord("place")],
+                        TSpeechObject(
+                            [
+                                TSpeech(
+                                    [HotWord("position")],
+                                    TSpeechObject(
+                                        [
+                                            TSpeech([HotWord("star"), HotWord("circle"), HotWord("square")])
+                                        ]
+                                    )       
+                                )
+                            ]
+                        )
+                    )
+                ]
+            )
+        )
 
 else:
     def walk (args, s, level, parent):
         return []
     
-    # def get_next_remaining_branch(tree, *levels):
-    #     return None
-    
-    # def get_hotword_from_tree(tree, *levels):
-    #     return []
-    
-    # def tspeech_combinations(tspeech: TSpeechObject):
-    #     return []
+    def get_voice_default_config() -> Optional[VoiceConfig]:
+        return None

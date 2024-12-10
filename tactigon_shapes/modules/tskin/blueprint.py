@@ -6,7 +6,7 @@ from bleak import BleakScanner
 from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app
 from typing import Optional
 
-from .manager import start_tskin, load_tskin, stop_tskin, get_tskin
+from .manager import get_tskin_default_config, get_voice_default_config, start_tskin, load_tskin, stop_tskin, get_tskin
 from .models import TSkinModel, VoiceConfig, TSkinConfig, Hand, GestureConfig, TSpeechObject, TSpeech, HotWord
 
 from ..socketio import get_socket_app
@@ -127,7 +127,7 @@ def save():
     #     return redirect(url_for("tskin.add", tskin_name=tskin_name, tskin_mac=tskin_mac, hand=hand), code=307)
         
     hand = Hand(hand)
-    model_name = "MODEL_01_" + hand.name[0]
+    model_name = "MODEL_01_" + hand.name
 
     current_model: Optional[TSkinModel] = None
 
@@ -141,46 +141,11 @@ def save():
         return {"error": "model error"}, 500
         # return redirect(url_for("tskin.add"))
     
-    gesture_config = GestureConfig(
-        path.join("models", current_model.name, "model.pickle"),
-        path.join("models", current_model.name, "encoder.pickle"),
-        current_model.name,
-        current_model.date,
-        [g.gesture for g in current_model.gestures]
-    )
+    tskin_config = get_tskin_default_config(tskin_mac, hand, tskin_name, current_model)
+    voice_config = get_voice_default_config()
 
-    tskin_config = TSkinConfig(
-        tskin_mac,
-        hand,
-        tskin_name,
-        gesture_config
-    )
-
-    if sys.platform != "darwin":
-        voice_config = VoiceConfig(
-            path.join("speech", "deepspeech-0.9.3-models.tflite"),
-            path.join("speech", "tos.scorer"),
-            vad_padding_ms=800,
-            vad_frame=20,
-            voice_timeout=3,
-            silence_timeout=3,
-            voice_commands=TSpeechObject(
-                [
-                    TSpeech(
-                        [HotWord("enter"), HotWord("exit")],
-                        TSpeechObject(
-                            [
-                                TSpeech([HotWord("application")])
-                            ]
-                        )
-                    ),
-                ]
-            )
-        )
-
+    if voice_config:
         voice_config.stop_hotword = None
-    else:
-        voice_config = None
 
     if socket_app:
         socket_app.stop()

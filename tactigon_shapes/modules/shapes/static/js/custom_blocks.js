@@ -360,7 +360,7 @@ function loadKeyboardBlocks(funcKeys, modKeys) {
             field.setValidator(this.validateLetter);
         },
         validateLetter: function (newValue) {
-            if (newValue.length === 1 && /^[a-zA-Z]$/.test(newValue)) {
+            if (newValue.length === 1 && /^[a-zA-Z0-9]$/.test(newValue)) {
                 return newValue.toLowerCase(); // Convert to uppercase for consistency
             }
             return null; // Invalid input
@@ -525,29 +525,24 @@ from datetime import datetime
 from queue import Queue
 from tactigon_shapes.modules.shapes.extension import ShapesPostAction
 from tactigon_shapes.modules.braccio.extension import BraccioInterface, CommandStatus, Wrist, Gripper
-from tactigon_shapes.modules.tskin.models import TSkin, OneFingerGesture, TwoFingerGesture, HotWord, TSpeechObject, TSpeech
+from tactigon_shapes.modules.tskin.models import TSkin, Gesture, Touch, OneFingerGesture, TwoFingerGesture, HotWord, TSpeechObject, TSpeech
 from pynput.keyboard import Controller as KeyboardController, HotKey, KeyCode
-from typing import List, Optional`;
+from typing import List, Optional, Union`;
         
         var libs = `
-def check_gesture(tskin: TSkin, gesture: str) -> bool:
-    g = tskin.gesture_preserve
-    if not g:
+def check_gesture(gesture: Optional[Gesture], gesture_to_find: str) -> bool:
+    if not gesture:
         return False
-    if g.gesture == gesture:
-        _ = tskin.gesture
-        return True
-    return False
+    
+    return gesture.gesture == gesture_to_find
 
-def check_touch(tskin: TSkin, finger_gesture: str, actions: List[ShapesPostAction]) -> bool:
-    touch = tskin.touch_preserve
+def check_touch(touch: Optional[Touch], finger_gesture: str, actions: List[ShapesPostAction]) -> bool:
     if not touch:
         return False
     _g_one = None
     try:
         _g_one = OneFingerGesture[finger_gesture]
         if touch.one_finger == _g_one:
-            _ = tskin.touch
             return True
     except:
         pass
@@ -555,51 +550,50 @@ def check_touch(tskin: TSkin, finger_gesture: str, actions: List[ShapesPostActio
     try:
         _g_two = TwoFingerGesture[finger_gesture]
         if touch.two_finger == _g_two:
-            _ = tskin.touch
             return True
     except:
         pass
     return False
 
-def check_speech(tskin: TSkin, debug_queue: Queue, hotwords: List[HotWord]):
-    def build_tspeech(hws: List[HotWord]) -> Optional[TSpeechObject]:
+def check_speech(tskin: TSkin, debug_queue: Queue, hotwords: List[Union[HotWord, List[HotWord]]]):
+    def build_tspeech(hws: List[Union[HotWord, List[HotWord]]]) -> Optional[TSpeechObject]:
         if not hws:
             return None
-        
+
         hw, *rest = hws
 
         return TSpeechObject(
             [
                 TSpeech(hw, build_tspeech(rest))
             ]
-        )  
-    
+        )
+
     tspeech = build_tspeech(hotwords)
 
     if tspeech and tskin.can_listen:
-        debug(debug_queue, f"Waiting for commands: {', '.join([hw.word for hw in hotwords])}")
+        debug(debug_queue, f"Waiting for command...")
         r = tskin.listen(tspeech)
         if r:
             debug(debug_queue, "Listening....")
             text_so_far = ""
-            while tskin.is_listening:
+            t = None
+            while True:
+                t = tskin.transcription
+
+                if t:
+                    break
+
                 if text_so_far != tskin.text_so_far:
                     text_so_far = tskin.text_so_far
                     debug(debug_queue, f"Listening: {text_so_far}")
-                time.sleep(0.1)
-            
-            t = tskin.transcription
+                time.sleep(tskin.TICK)
+
             if t and t.path is not None:
-                for hw in hotwords:
-                    if hw not in t.path:
-                        debug(debug_queue, f"Incomplete command... Only got {', '.join([hw.word for hw in t.path])}")
-                        return False
-                    
-                debug(debug_queue, f"Command found!")
-                return True
+                debug(debug_queue, f"Command found: {[hw.word for hw in t.path]}")
+                return [hw.word for hw in t.path]
 
     debug(debug_queue, "Cannot listen...")
-    return False
+    return []
 
 def keyboard_press(keyboard: KeyboardController, commands: List[KeyCode]):
     for k in commands:
@@ -670,7 +664,9 @@ def reset_touch(tskin: TSkin):
         }).join('\n');
 
         var code = libs + 'def app(tskin: TSkin, keyboard: KeyboardController, braccio: Optional[BraccioInterface], actions: List[ShapesPostAction], debug_queue: Queue):\n' + 
-            variables + '\n' + 
+            variables + '\n' + "\n" +
+            Blockly.Python.INDENT + "gesture = tskin.gesture\n" +
+            Blockly.Python.INDENT + "touch = tskin.touch\n" +
             statements_body + '\n';
         return code;
     };
@@ -691,7 +687,7 @@ def reset_touch(tskin: TSkin):
 function defineTSkinGenerators(){
     python.pythonGenerator.forBlock['tskin_gesture_list'] = function (block) {
         var gesture = block.getFieldValue('gesture');
-        var code = `check_gesture(tskin, "${gesture}")`;
+        var code = `check_gesture(gesture, "${gesture}")`;
         return [code, Blockly.Python.ORDER_ATOMIC];
     };
 
@@ -710,7 +706,7 @@ function defineTSkinGenerators(){
     python.pythonGenerator.forBlock['tskin_touch_list'] = function (block, generator) {
         var touchType = block.getFieldValue('touch');
 
-        var code = `check_touch(tskin, "${touchType}", actions)`
+        var code = `check_touch(touch, "${touchType}", actions)`
 
         return [code, Blockly.Python.ORDER_ATOMIC];
     };
@@ -718,9 +714,15 @@ function defineTSkinGenerators(){
 
 function defineSpeechGenerators(){
     python.pythonGenerator.forBlock['tskin_take_voice'] = function (block, generator) {
+        debugger;
         let args = block.inputList[0].fieldRow
             .filter((f) => f.selectedOption && f.selectedOption[1] != "")
-            .map((f) => `HotWord("${f.selectedOption[1]}")`)
+            .map((f) => {
+                if (f.selectedOption[1] == "---"){
+                    return `[${f.optionMapping.position.filter((o) => o[0] != "---").map((o) => `HotWord("${o[0]}")`).join(", ")}]`
+                }
+                return `HotWord("${f.selectedOption[1]}")`;
+            })
             .join(", ");
 
         var code = `check_speech(tskin, debug_queue, [${args}])`

@@ -83,13 +83,6 @@ if sys.platform != "darwin":
         def can_listen(self):
             return True
 
-        @property
-        def touch_preserve(self) -> Optional[Touch]:
-            self._update_touch.acquire()
-            touch = self._touch
-            self._update_touch.release()
-            return touch
-
 else:
     @dataclass
     class VoiceConfig:

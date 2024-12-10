@@ -27,8 +27,6 @@ class AppConfig(object):
     MODELS: List[TSkinModel] = field(default_factory=list)
     TSKIN: Optional[TSkinConfig] = None
     TSKIN_VOICE: Optional[VoiceConfig] = None
-    MAXIMIZED: bool = True
-    FULLSCREEN: bool = False
     file_path: Optional[str] = None
 
     @classmethod
@@ -36,12 +34,12 @@ class AppConfig(object):
         gestures = [
             ModelGesture("up", "Up"),
             ModelGesture("down", "Down"),
-            ModelGesture("push", "Up"),
-            ModelGesture("pull", "Up"),
-            ModelGesture("twist", "Up"),
-            ModelGesture("circle", "Up"),
-            ModelGesture("swipe_r", "Up"),
-            ModelGesture("swipe_l", "Up"),
+            ModelGesture("push", "Push"),
+            ModelGesture("pull", "Pull"),
+            ModelGesture("twist", "Twist"),
+            ModelGesture("circle", "Circle"),
+            ModelGesture("swipe_r", "Swipe right"),
+            ModelGesture("swipe_l", "Swipe left"),
         ]
         touchs = [
             ModelTouch(OneFingerGesture.SINGLE_TAP, "Tap"),
@@ -51,8 +49,8 @@ class AppConfig(object):
             DEBUG=True,
             SECRET_KEY="change-me",
             MODELS=[
-                TSkinModel("MODEL_01_L", Hand.LEFT, datetime.now(), gestures, touchs),
-                TSkinModel("MODEL_01_R", Hand.RIGHT, datetime.now(), gestures, touchs),
+                TSkinModel("MODEL_01_LEFT", Hand.LEFT, datetime.now(), gestures, touchs),
+                TSkinModel("MODEL_01_RIGHT", Hand.RIGHT, datetime.now(), gestures, touchs),
             ],
             file_path=file_path
         )
@@ -71,8 +69,6 @@ class AppConfig(object):
             [TSkinModel.FromJSON(f) for f in json["MODELS"]],
             TSkinConfig.FromJSON(json["TSKIN"]) if "TSKIN" in json and json["TSKIN"] is not None else None,
             VoiceConfig.FromJSON(json["TSKIN_VOICE"]) if "TSKIN_VOICE" in json and json["TSKIN_VOICE"] is not None and sys.platform != "darwin" else None,
-            json["MAXIMIZED"],
-            json["FULLSCREEN"],
             file_path
             )
     
@@ -83,9 +79,7 @@ class AppConfig(object):
             "SEND_FILE_MAX_AGE_DEFAULT": self.SEND_FILE_MAX_AGE_DEFAULT,
             "MODELS": [m.toJSON() for m in self.MODELS],
             "TSKIN": self.TSKIN.toJSON() if self.TSKIN else None,
-            "TSKIN_VOICE": self.TSKIN_VOICE.toJSON() if self.TSKIN_VOICE else None,
-            "MAXIMIZED": self.MAXIMIZED,
-            "FULLSCREEN": self.FULLSCREEN
+            "TSKIN_VOICE": self.TSKIN_VOICE.toJSON() if self.TSKIN_VOICE else None
         }
     
     def save(self):
