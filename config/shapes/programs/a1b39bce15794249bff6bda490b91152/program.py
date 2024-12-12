@@ -8,12 +8,11 @@ pitch = None
 
 import time
 from datetime import datetime
-from queue import Queue
-from tactigon_shapes.modules.shapes.extension import ShapesPostAction
+from tactigon_shapes.modules.shapes.extension import ShapesPostAction, LoggingQueue
 from tactigon_shapes.modules.braccio.extension import BraccioInterface, CommandStatus, Wrist, Gripper
-from tactigon_shapes.modules.tskin.models import TSkin, OneFingerGesture, TwoFingerGesture, HotWord, TSpeechObject, TSpeech
+from tactigon_shapes.modules.tskin.models import TSkin, Gesture, Touch, OneFingerGesture, TwoFingerGesture, HotWord, TSpeechObject, TSpeech
 from pynput.keyboard import Controller as KeyboardController, HotKey, KeyCode
-from typing import List, Optional
+from typing import List, Optional, Union
 
 
 pos_x = 0
@@ -25,24 +24,19 @@ pitch = 0
 # This is the main function that runs your code. Any
 # code blocks you add to this section will be executed.
 
-def check_gesture(tskin: TSkin, gesture: str) -> bool:
-    g = tskin.gesture_preserve
-    if not g:
+def check_gesture(gesture: Optional[Gesture], gesture_to_find: str) -> bool:
+    if not gesture:
         return False
-    if g.gesture == gesture:
-        _ = tskin.gesture
-        return True
-    return False
 
-def check_touch(tskin: TSkin, finger_gesture: str, actions: List[ShapesPostAction]) -> bool:
-    touch = tskin.touch_preserve
+    return gesture.gesture == gesture_to_find
+
+def check_touch(touch: Optional[Touch], finger_gesture: str, actions: List[ShapesPostAction]) -> bool:
     if not touch:
         return False
     _g_one = None
     try:
         _g_one = OneFingerGesture[finger_gesture]
         if touch.one_finger == _g_one:
-            _ = tskin.touch
             return True
     except:
         pass
@@ -50,14 +44,13 @@ def check_touch(tskin: TSkin, finger_gesture: str, actions: List[ShapesPostActio
     try:
         _g_two = TwoFingerGesture[finger_gesture]
         if touch.two_finger == _g_two:
-            _ = tskin.touch
             return True
     except:
         pass
     return False
 
-def check_speech(tskin: TSkin, debug_queue: Queue, hotwords: List[HotWord]):
-    def build_tspeech(hws: List[HotWord]) -> Optional[TSpeechObject]:
+def check_speech(tskin: TSkin, logging_queue: LoggingQueue, hotwords: List[Union[HotWord, List[HotWord]]]):
+    def build_tspeech(hws: List[Union[HotWord, List[HotWord]]]) -> Optional[TSpeechObject]:
         if not hws:
             return None
 
@@ -72,29 +65,29 @@ def check_speech(tskin: TSkin, debug_queue: Queue, hotwords: List[HotWord]):
     tspeech = build_tspeech(hotwords)
 
     if tspeech and tskin.can_listen:
-        debug(debug_queue, f"Waiting for commands: {', '.join([hw.word for hw in hotwords])}")
+        debug(logging_queue, f"Waiting for command...")
         r = tskin.listen(tspeech)
         if r:
-            debug(debug_queue, "Listening....")
+            debug(logging_queue, "Listening....")
             text_so_far = ""
-            while tskin.is_listening:
+            t = None
+            while True:
+                t = tskin.transcription
+
+                if t:
+                    break
+
                 if text_so_far != tskin.text_so_far:
                     text_so_far = tskin.text_so_far
-                    debug(debug_queue, f"Listening: {text_so_far}")
-                time.sleep(0.1)
+                    debug(logging_queue, f"Listening: {text_so_far}")
+                time.sleep(tskin.TICK)
 
-            t = tskin.transcription
             if t and t.path is not None:
-                for hw in hotwords:
-                    if hw not in t.path:
-                        debug(debug_queue, f"Incomplete command... Only got {', '.join([hw.word for hw in t.path])}")
-                        return False
+                debug(logging_queue, f"Command found: {[hw.word for hw in t.path]}")
+                return [hw.word for hw in t.path]
 
-                debug(debug_queue, f"Command found!")
-                return True
-
-    debug(debug_queue, "Cannot listen...")
-    return False
+    debug(logging_queue, "Cannot listen...")
+    return []
 
 def keyboard_press(keyboard: KeyboardController, commands: List[KeyCode]):
     for k in commands:
@@ -104,47 +97,47 @@ def keyboard_press(keyboard: KeyboardController, commands: List[KeyCode]):
         _k = k.char if isinstance(k, KeyCode) and k.char else k
         keyboard.release(_k)
 
-def braccio_move(braccio: Optional[BraccioInterface], debug_queue: Queue, x: float, y: float, z: float):
+def braccio_move(braccio: Optional[BraccioInterface], logging_queue: LoggingQueue, x: float, y: float, z: float):
     if braccio:
         res = braccio.move(x, y, z)
         if res:
             if res[0]:
-                debug(debug_queue, f"Braccio command executed in {round(res[2], 2)}s.")
+                debug(logging_queue, f"Braccio command executed in {round(res[2], 2)}s.")
             else:
-                debug(debug_queue, f"Braccio command error: {res[1].name}")
+                debug(logging_queue, f"Braccio command error: {res[1].name}")
         else:
-            debug(debug_queue, "Braccio not connected")
+            debug(logging_queue, "Braccio not connected")
     else:
-        debug(debug_queue, "Braccio not configured")
+        debug(logging_queue, "Braccio not configured")
 
-def braccio_wrist(braccio: Optional[BraccioInterface], debug_queue: Queue, wrist: Wrist):
+def braccio_wrist(braccio: Optional[BraccioInterface], logging_queue: LoggingQueue, wrist: Wrist):
     if braccio:
         res = braccio.wrist(wrist)
         if res:
             if res[0]:
-                debug(debug_queue, f"Braccio command executed in {round(res[2], 2)}s.")
+                debug(logging_queue, f"Braccio command executed in {round(res[2], 2)}s.")
             else:
-                debug(debug_queue, f"Braccio command error: {res[1].name}")
+                debug(logging_queue, f"Braccio command error: {res[1].name}")
         else:
-            debug(debug_queue, "Braccio not connected")
+            debug(logging_queue, "Braccio not connected")
     else:
-        debug(debug_queue, "Braccio not configured")
+        debug(logging_queue, "Braccio not configured")
 
-def braccio_gripper(braccio: Optional[BraccioInterface], debug_queue: Queue, gripper: Gripper):
+def braccio_gripper(braccio: Optional[BraccioInterface], logging_queue: LoggingQueue, gripper: Gripper):
     if braccio:
         res = braccio.gripper(gripper)
         if res:
             if res[0]:
-                debug(debug_queue, f"Braccio command executed in {round(res[2], 2)}s.")
+                debug(logging_queue, f"Braccio command executed in {round(res[2], 2)}s.")
             else:
-                debug(debug_queue, f"Braccio command error: {res[1].name}")
+                debug(logging_queue, f"Braccio command error: {res[1].name}")
         else:
-            debug(debug_queue, "Braccio not connected")
+            debug(logging_queue, "Braccio not connected")
     else:
-        debug(debug_queue, "Braccio not configured")
+        debug(logging_queue, "Braccio not configured")
 
-def debug(debug_queue: Queue, msg: str):
-    debug_queue.put(F"[{datetime.now().isoformat()}] {msg}")
+def debug(logging_queue: LoggingQueue, msg: str):
+    logging_queue.debug(msg)
 
 def reset_touch(tskin: TSkin):
         if tskin.touch_preserve:
@@ -152,13 +145,16 @@ def reset_touch(tskin: TSkin):
 
 # This is the main function that runs your code. Any
 # code blocks you add to this section will be executed.
-def app(tskin: TSkin, keyboard: KeyboardController, braccio: Optional[BraccioInterface], actions: List[ShapesPostAction], debug_queue: Queue):
+def app(tskin: TSkin, keyboard: KeyboardController, braccio: Optional[BraccioInterface], actions: List[ShapesPostAction], logging_queue: LoggingQueue):
     global pos_x
     global pos_y
     global pos_z
     global roll
     global pitch
-    if check_touch(tskin, "TAP_AND_HOLD", actions):
+
+    gesture = tskin.gesture
+    touch = tskin.touch
+    if check_touch(touch, "TAP_AND_HOLD", actions):
         roll = tskin.angle and tskin.angle.roll
         pitch = tskin.angle and tskin.angle.pitch
         if roll < -15:
@@ -169,5 +165,5 @@ def app(tskin: TSkin, keyboard: KeyboardController, braccio: Optional[BraccioInt
             pos_y = (pos_y if isinstance(pos_y, Number) else 0) + -20
         elif pitch > 15:
             pos_y = (pos_y if isinstance(pos_y, Number) else 0) + 20
-        debug(debug_queue, (''.join([str(x) for x in [pos_x, '|', pos_y, '|', pos_z]])))
-        braccio_move(braccio, debug_queue, pos_x, pos_y, pos_z)
+        debug(logging_queue, (''.join([str(x) for x in [pos_x, '|', pos_y, '|', pos_z]])))
+        braccio_move(braccio, logging_queue, pos_x, pos_y, pos_z)

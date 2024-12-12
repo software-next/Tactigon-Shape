@@ -1,4 +1,12 @@
-direction = None
+from numbers import Number
+import random
+
+prima_mano = None
+puo_giocare = None
+nuova_carta = None
+mazziere_vuole_carte = None
+carte_mazziere = None
+mie_carte = None
 
 import time
 from datetime import datetime
@@ -8,8 +16,20 @@ from tactigon_shapes.modules.tskin.models import TSkin, Gesture, Touch, OneFinge
 from pynput.keyboard import Controller as KeyboardController, HotKey, KeyCode
 from typing import List, Optional, Union
 
+def dai_carta():
+    global prima_mano, puo_giocare, nuova_carta, mazziere_vuole_carte, carte_mazziere, mie_carte
+    nuova_carta = random.randint(1, 13)
+    if nuova_carta > 10:
+        nuova_carta = 10
+    return nuova_carta
 
-direction = True
+
+prima_mano = True
+puo_giocare = False
+mazziere_vuole_carte = False
+mie_carte = 0
+nuova_carta = 0
+carte_mazziere = 0
 
 # This is the main function that runs your code. Any
 # code blocks you add to this section will be executed.
@@ -136,31 +156,50 @@ def reset_touch(tskin: TSkin):
 # This is the main function that runs your code. Any
 # code blocks you add to this section will be executed.
 def app(tskin: TSkin, keyboard: KeyboardController, braccio: Optional[BraccioInterface], actions: List[ShapesPostAction], logging_queue: LoggingQueue):
-    global direction
+    global mie_carte
+    global nuova_carta
+    global puo_giocare
+    global mazziere_vuole_carte
+    global carte_mazziere
+    global prima_mano
 
     gesture = tskin.gesture
     touch = tskin.touch
-    if check_touch(touch, "SINGLE_TAP", actions):
-        if direction:
-            braccio_gripper(braccio, logging_queue, Gripper['OPEN'])
-            braccio_move(braccio, logging_queue, 0, 100, 100)
-            braccio_move(braccio, logging_queue, 0, 100, (-20))
-            braccio_gripper(braccio, logging_queue, Gripper['CLOSE'])
-            braccio_move(braccio, logging_queue, 0, 100, 100)
-            braccio_move(braccio, logging_queue, 100, 0, 100)
-            braccio_move(braccio, logging_queue, 100, 0, (-20))
-            braccio_gripper(braccio, logging_queue, Gripper['OPEN'])
-            braccio_move(braccio, logging_queue, 100, 0, 100)
-            braccio_gripper(braccio, logging_queue, Gripper['CLOSE'])
+    if puo_giocare:
+        if check_gesture(gesture, "swipe_r"):
+            if prima_mano:
+                debug(logging_queue, 'Dammi le carte')
+                for count in range(2):
+                    mie_carte = (mie_carte if isinstance(mie_carte, Number) else 0) + dai_carta()
+                prima_mano = False
+                debug(logging_queue, ('Hai in mano:' + str(mie_carte)))
+            else:
+                mie_carte = (mie_carte if isinstance(mie_carte, Number) else 0) + dai_carta()
+                debug(logging_queue, ('Hai in mano:' + str(mie_carte)))
+        elif check_gesture(gesture, "swipe_l"):
+            debug(logging_queue, 'Ho finito')
+            puo_giocare = False
+            mazziere_vuole_carte = True
+    elif mazziere_vuole_carte:
+        for count2 in range(2):
+            carte_mazziere = (carte_mazziere if isinstance(carte_mazziere, Number) else 0) + dai_carta()
+        if carte_mazziere < 15:
+            carte_mazziere = (carte_mazziere if isinstance(carte_mazziere, Number) else 0) + dai_carta()
         else:
-            braccio_gripper(braccio, logging_queue, Gripper['OPEN'])
-            braccio_move(braccio, logging_queue, 100, 0, 100)
-            braccio_move(braccio, logging_queue, 100, 0, (-20))
-            braccio_gripper(braccio, logging_queue, Gripper['CLOSE'])
-            braccio_move(braccio, logging_queue, 100, 0, 100)
-            braccio_move(braccio, logging_queue, 0, 100, 100)
-            braccio_move(braccio, logging_queue, 0, 100, (-20))
-            braccio_gripper(braccio, logging_queue, Gripper['OPEN'])
-            braccio_move(braccio, logging_queue, 0, 100, 100)
-            braccio_gripper(braccio, logging_queue, Gripper['CLOSE'])
-        direction = not direction
+            debug(logging_queue, (''.join([str(x) for x in ['Le tue carte: ', mie_carte, ' carte del mazziere: ', carte_mazziere]])))
+            if mie_carte > 21:
+                debug(logging_queue, 'Ho perso....')
+            elif carte_mazziere > 21:
+                debug(logging_queue, 'Ho vinto io!')
+            else:
+                if carte_mazziere > mie_carte:
+                    debug(logging_queue, 'Vince il banco...')
+                else:
+                    debug(logging_queue, 'Ho vinto io!')
+            puo_giocare = False
+            mazziere_vuole_carte = False
+    else:
+        if check_gesture(gesture, "up"):
+            debug(logging_queue, 'Nuovo gioco!')
+            puo_giocare = True
+            mazziere_vuole_carte = False

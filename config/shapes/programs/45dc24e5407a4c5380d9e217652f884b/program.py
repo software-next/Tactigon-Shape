@@ -1,4 +1,5 @@
-direction = None
+positions = None
+wrist_pos = None
 
 import time
 from datetime import datetime
@@ -9,7 +10,8 @@ from pynput.keyboard import Controller as KeyboardController, HotKey, KeyCode
 from typing import List, Optional, Union
 
 
-direction = True
+positions = []
+wrist_pos = True
 
 # This is the main function that runs your code. Any
 # code blocks you add to this section will be executed.
@@ -136,31 +138,40 @@ def reset_touch(tskin: TSkin):
 # This is the main function that runs your code. Any
 # code blocks you add to this section will be executed.
 def app(tskin: TSkin, keyboard: KeyboardController, braccio: Optional[BraccioInterface], actions: List[ShapesPostAction], logging_queue: LoggingQueue):
-    global direction
+    global positions
+    global wrist_pos
 
     gesture = tskin.gesture
     touch = tskin.touch
     if check_touch(touch, "SINGLE_TAP", actions):
-        if direction:
-            braccio_gripper(braccio, logging_queue, Gripper['OPEN'])
-            braccio_move(braccio, logging_queue, 0, 100, 100)
-            braccio_move(braccio, logging_queue, 0, 100, (-20))
-            braccio_gripper(braccio, logging_queue, Gripper['CLOSE'])
-            braccio_move(braccio, logging_queue, 0, 100, 100)
-            braccio_move(braccio, logging_queue, 100, 0, 100)
-            braccio_move(braccio, logging_queue, 100, 0, (-20))
-            braccio_gripper(braccio, logging_queue, Gripper['OPEN'])
-            braccio_move(braccio, logging_queue, 100, 0, 100)
-            braccio_gripper(braccio, logging_queue, Gripper['CLOSE'])
+        positions = check_speech(tskin, logging_queue, [HotWord("pick"), HotWord("position"), [HotWord("star"), HotWord("circle"), HotWord("square")]])
+        if len(positions) == 3:
+            if positions[-1] == 'star':
+                debug(logging_queue, 'Pick from star')
+                braccio_gripper(braccio, logging_queue, Gripper['OPEN'])
+                braccio_move(braccio, logging_queue, (-100), 100, 100)
+                braccio_move(braccio, logging_queue, (-100), 100, (-20))
+                braccio_gripper(braccio, logging_queue, Gripper['CLOSE'])
+                braccio_move(braccio, logging_queue, (-100), 100, 100)
+                braccio_move(braccio, logging_queue, 0, 100, 100)
+                braccio_move(braccio, logging_queue, 0, 100, (-20))
+                braccio_gripper(braccio, logging_queue, Gripper['OPEN'])
+                braccio_move(braccio, logging_queue, 0, 100, 100)
+            elif positions[-1] == 'square':
+                debug(logging_queue, 'Pick from square')
+                braccio_gripper(braccio, logging_queue, Gripper['OPEN'])
+                braccio_move(braccio, logging_queue, 100, 100, 100)
+                braccio_move(braccio, logging_queue, 100, 100, (-20))
+                braccio_gripper(braccio, logging_queue, Gripper['CLOSE'])
+                braccio_move(braccio, logging_queue, 100, 100, 100)
+                braccio_move(braccio, logging_queue, 0, 100, 100)
+                braccio_move(braccio, logging_queue, 0, 100, (-20))
+                braccio_gripper(braccio, logging_queue, Gripper['OPEN'])
+                braccio_move(braccio, logging_queue, 0, 100, 100)
+    if check_gesture(gesture, "twist"):
+        debug(logging_queue, 'Rotate wrist')
+        wrist_pos = not wrist_pos
+        if wrist_pos:
+            braccio_wrist(braccio, logging_queue, Wrist['HORIZONTAL'])
         else:
-            braccio_gripper(braccio, logging_queue, Gripper['OPEN'])
-            braccio_move(braccio, logging_queue, 100, 0, 100)
-            braccio_move(braccio, logging_queue, 100, 0, (-20))
-            braccio_gripper(braccio, logging_queue, Gripper['CLOSE'])
-            braccio_move(braccio, logging_queue, 100, 0, 100)
-            braccio_move(braccio, logging_queue, 0, 100, 100)
-            braccio_move(braccio, logging_queue, 0, 100, (-20))
-            braccio_gripper(braccio, logging_queue, Gripper['OPEN'])
-            braccio_move(braccio, logging_queue, 0, 100, 100)
-            braccio_gripper(braccio, logging_queue, Gripper['CLOSE'])
-        direction = not direction
+            braccio_wrist(braccio, logging_queue, Wrist['VERTICAL'])
