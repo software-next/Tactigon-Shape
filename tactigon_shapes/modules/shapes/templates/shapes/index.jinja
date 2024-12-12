@@ -306,13 +306,14 @@
         {%if state %}
         workspace = Blockly.inject('blocklyDiv', options);
         var initState = JSON.parse({{ state | tojson }});
-    Blockly.serialization.workspaces.load(initState, workspace);
-    {% endif %}
-    return workspace;
+        Blockly.serialization.workspaces.load(initState, workspace);
+        {% endif %}
+        return workspace;
     }
 
 
-    $(document).ready(async function () {
+    $(document).ready(() => {
+        const terminal = $("#terminal");
 
         $("#run_application").change(function () {
             if (this.checked) {
@@ -323,15 +324,19 @@
         })
 
         {% if current_config.id == current_running_program %}
-        socket.on("terminal_debug", (event) => {
-            $("#terminal").prepend(
-                $("<span/>").html(event)
-            )
+        socket.on("logging", (event) => {
+            if (terminal.find("span.ERROR").length > 0){
+                return;
+            }
+
+            terminal.prepend(
+                $("<span/>", {class: event.severity}).html(`[${event.date}] ${event.severity}: ${event.message}`)
+            );
         });
         {% endif %}
         loadCustomBlocks({{ blocks_config | tojson | safe }});
-    defineCustomGenerators();
-    const workspace = initializeBlockly();
+        defineCustomGenerators();
+        const workspace = initializeBlockly();
     });
 
 </script>

@@ -102,7 +102,7 @@ class SocketApp(SocketIO):
                 braccio_connection = self.braccio_interface.connected
 
             payload = {
-                "selector": tskin.selector.value,
+                "selector": tskin.selector.value if tskin.selector else None,
                 "connected": tskin.connected,
                 "battery": tskin.battery,
                 "braccio_status": braccio_status,
@@ -112,7 +112,8 @@ class SocketApp(SocketIO):
             self.emit("state", payload)
 
             if self._shapes_app and self._shapes_app.is_running:
-                msg = self._shapes_app.debug_message
-                self.emit("terminal_debug", msg)
+                msg = self._shapes_app.get_log()
+                if msg:
+                    self.emit("logging", msg.toJSON())
                 
             self.sleep(SocketApp._TICK)  # type: ignore

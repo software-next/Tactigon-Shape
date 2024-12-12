@@ -458,9 +458,11 @@
     }
 
     function setGeneratedCode(workspace) {
+        debugger;
         Blockly.Python.addReservedWords('code');
         const code = python.pythonGenerator.workspaceToCode(workspace);
-        $('#generatedCode').val(code);
+        let origin = code.indexOf("# Shapes");
+        $('#generatedCode').val(code.substring(origin));
     }
 
     function setState(workspace) {

@@ -29,7 +29,6 @@ class Severity(Enum):
 class ShapesPostAction(Enum):
     READ_TOUCH = 1
 
-
 @dataclass
 class Program:
     state: object
@@ -65,7 +64,64 @@ class ShapeConfig:
             description=self.description,
             readonly=self.readonly
         )
+    
+@dataclass
+class DebugMessage:
+    severity: Severity
+    date: datetime
+    message: str
 
+    @classmethod
+    def Debug(cls, message: str):
+        return cls(
+            Severity.DEBUG,
+            datetime.now(),
+            message
+        )
+
+    @classmethod
+    def Info(cls, message: str):
+        return cls(
+            Severity.INFO,
+            datetime.now(),
+            message
+        )
+    
+    @classmethod
+    def Warning(cls, message: str):
+        return cls(
+            Severity.WARNING,
+            datetime.now(),
+            message
+        )
+    
+    @classmethod
+    def Error(cls, message: str):
+        return cls(
+            Severity.ERROR,
+            datetime.now(),
+            message
+        )
+    
+    def toJSON(self) -> dict:
+        return dict(
+            severity=self.severity.name,
+            date=self.date.isoformat(),
+            message=self.message
+        )
+
+class LoggingQueue(Queue):
+    def debug(self, msg):
+        self.put_nowait(DebugMessage.Debug(msg))
+
+    def info(self, msg):
+        self.put_nowait(DebugMessage.Info(msg))
+
+    def warning(self, msg):
+        self.put_nowait(DebugMessage.Warning(msg))
+
+    def error(self, msg):
+        self.put_nowait(DebugMessage.Error(msg))
 
 class ShapeThread(ExtensionThread):
     MODULE_NAME: str = "ShapeThreadModule"
@@ -74,13 +130,13 @@ class ShapeThread(ExtensionThread):
 
     _tskin: TSkin
     _keyboard: KeyboardController
-    _debug_queue: Queue
+    _logging_queue: LoggingQueue
     _braccio_interface: Optional[BraccioInterface] = None
 
-    def __init__(self, base_path: str, app: ShapeConfig, keyboard: KeyboardController, braccio: Optional[BraccioInterface], debug_queue: Queue, tskin: TSkin):
+    def __init__(self, base_path: str, app: ShapeConfig, keyboard: KeyboardController, braccio: Optional[BraccioInterface], logging_queue: LoggingQueue, tskin: TSkin):
         self._keyboard = keyboard
         self._tskin = tskin
-        self._debug_queue = debug_queue
+        self._logging_queue = logging_queue
         self._braccio_interface = braccio
 
         ExtensionThread.__init__(self)
@@ -113,9 +169,12 @@ class ShapeThread(ExtensionThread):
             
         return False
 
-    def main(self):
+    def main(self):       
         actions: List[Tuple[ShapesPostAction, Any]] = []
-        self.module.app(self._tskin, self._keyboard, self.braccio_interface, actions, self._debug_queue)
+        try:
+            self.module.app(self._tskin, self._keyboard, self.braccio_interface, actions, self._logging_queue)
+        except Exception as e:
+            self._logging_queue.error(str(e))
 
     def load_module(self, source: str):
         """
@@ -137,7 +196,7 @@ class ShapesApp(ExtensionApp):
     shapes_file_path: str
     keyboard: KeyboardController
     current_id: Optional[UUID] = None
-    debug_queue: Queue
+    logging_queue: LoggingQueue
 
     _braccio_interface: Optional[BraccioInterface] = None
 
@@ -145,7 +204,7 @@ class ShapesApp(ExtensionApp):
         self.config_file_path = path.join(config_path, "config.json")
         self.shapes_file_path = config_path
         self.keyboard = KeyboardController()
-        self.debug_queue = Queue()
+        self.logging_queue = LoggingQueue()
 
         if sys.platform == "darwin":
             self.hotkey_list = [("<ctrl>+", "ctrl"), ("<cmd>+", "cmd"), ("<shift>+", "shift"), ("<alt>+", "alt"), ("<cmd>+<alt>+", "cmd+alt"), ("<cmd>+<shift>+", "cmd+shift")]
@@ -171,10 +230,9 @@ class ShapesApp(ExtensionApp):
     def braccio_interface(self, braccio_interface: Optional[BraccioInterface]):
         self._braccio_interface = braccio_interface
 
-    @property
-    def debug_message(self) -> Optional[Any]:
+    def get_log(self) -> Optional[DebugMessage]:
         try:
-            return self.debug_queue.get_nowait()
+            return self.logging_queue.get_nowait()
         except:
             return None
 
@@ -262,7 +320,6 @@ class ShapesApp(ExtensionApp):
             "taps": taps,           
             "wristOptions": self.wristOptions,
             "gripperOptions": self.gripperOptions,
-            "severity": [[s.name, str(s.value)] for s in Severity]
         }
 
         return data
@@ -319,7 +376,7 @@ class ShapesApp(ExtensionApp):
 
                 self.current_id = _config.id
                 try:
-                    self.thread = ShapeThread(self.shapes_file_path, _config, self.keyboard, self.braccio_interface, self.debug_queue, tskin)
+                    self.thread = ShapeThread(self.shapes_file_path, _config, self.keyboard, self.braccio_interface, self.logging_queue, tskin)
                     self.thread.start()
                 except Exception as e:
                     self.current_id = None
@@ -337,7 +394,7 @@ class ShapesApp(ExtensionApp):
     def stop(self):
         ExtensionApp.stop(self)
         while True:
-            if not self.debug_message:
+            if not self.get_log():
                 break
 
     def __create_or_update_files(self, config_id: UUID, program: Program) -> bool:

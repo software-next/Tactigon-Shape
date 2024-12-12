@@ -520,10 +520,11 @@ function defineCustomGenerators() {
 
     python.pythonGenerator.forBlock['tactigon_shape_function'] = function (block, generator) {
         Blockly.Python.definitions_['import_requests'] = `
+# Shapes by Next Industries
+
 import time
 from datetime import datetime
-from queue import Queue
-from tactigon_shapes.modules.shapes.extension import ShapesPostAction
+from tactigon_shapes.modules.shapes.extension import ShapesPostAction, LoggingQueue
 from tactigon_shapes.modules.braccio.extension import BraccioInterface, CommandStatus, Wrist, Gripper
 from tactigon_shapes.modules.tskin.models import TSkin, Gesture, Touch, OneFingerGesture, TwoFingerGesture, HotWord, TSpeechObject, TSpeech
 from pynput.keyboard import Controller as KeyboardController, HotKey, KeyCode
@@ -555,7 +556,7 @@ def check_touch(touch: Optional[Touch], finger_gesture: str, actions: List[Shape
         pass
     return False
 
-def check_speech(tskin: TSkin, debug_queue: Queue, hotwords: List[Union[HotWord, List[HotWord]]]):
+def check_speech(tskin: TSkin, logging_queue: LoggingQueue, hotwords: List[Union[HotWord, List[HotWord]]]):
     def build_tspeech(hws: List[Union[HotWord, List[HotWord]]]) -> Optional[TSpeechObject]:
         if not hws:
             return None
@@ -571,10 +572,10 @@ def check_speech(tskin: TSkin, debug_queue: Queue, hotwords: List[Union[HotWord,
     tspeech = build_tspeech(hotwords)
 
     if tspeech and tskin.can_listen:
-        debug(debug_queue, f"Waiting for command...")
+        debug(logging_queue, f"Waiting for command...")
         r = tskin.listen(tspeech)
         if r:
-            debug(debug_queue, "Listening....")
+            debug(logging_queue, "Listening....")
             text_so_far = ""
             t = None
             while True:
@@ -585,14 +586,14 @@ def check_speech(tskin: TSkin, debug_queue: Queue, hotwords: List[Union[HotWord,
 
                 if text_so_far != tskin.text_so_far:
                     text_so_far = tskin.text_so_far
-                    debug(debug_queue, f"Listening: {text_so_far}")
+                    debug(logging_queue, f"Listening: {text_so_far}")
                 time.sleep(tskin.TICK)
 
             if t and t.path is not None:
-                debug(debug_queue, f"Command found: {[hw.word for hw in t.path]}")
+                debug(logging_queue, f"Command found: {[hw.word for hw in t.path]}")
                 return [hw.word for hw in t.path]
 
-    debug(debug_queue, "Cannot listen...")
+    debug(logging_queue, "Cannot listen...")
     return []
 
 def keyboard_press(keyboard: KeyboardController, commands: List[KeyCode]):
@@ -603,47 +604,47 @@ def keyboard_press(keyboard: KeyboardController, commands: List[KeyCode]):
         _k = k.char if isinstance(k, KeyCode) and k.char else k
         keyboard.release(_k)
 
-def braccio_move(braccio: Optional[BraccioInterface], debug_queue: Queue, x: float, y: float, z: float):
+def braccio_move(braccio: Optional[BraccioInterface], logging_queue: LoggingQueue, x: float, y: float, z: float):
     if braccio:
         res = braccio.move(x, y, z)
         if res:
             if res[0]:
-                debug(debug_queue, f"Braccio command executed in {round(res[2], 2)}s.")
+                debug(logging_queue, f"Braccio command executed in {round(res[2], 2)}s.")
             else:
-                debug(debug_queue, f"Braccio command error: {res[1].name}")
+                debug(logging_queue, f"Braccio command error: {res[1].name}")
         else:
-            debug(debug_queue, "Braccio not connected")
+            debug(logging_queue, "Braccio not connected")
     else:
-        debug(debug_queue, "Braccio not configured")
+        debug(logging_queue, "Braccio not configured")
 
-def braccio_wrist(braccio: Optional[BraccioInterface], debug_queue: Queue, wrist: Wrist):
+def braccio_wrist(braccio: Optional[BraccioInterface], logging_queue: LoggingQueue, wrist: Wrist):
     if braccio:
         res = braccio.wrist(wrist)
         if res:
             if res[0]:
-                debug(debug_queue, f"Braccio command executed in {round(res[2], 2)}s.")
+                debug(logging_queue, f"Braccio command executed in {round(res[2], 2)}s.")
             else:
-                debug(debug_queue, f"Braccio command error: {res[1].name}")
+                debug(logging_queue, f"Braccio command error: {res[1].name}")
         else:
-            debug(debug_queue, "Braccio not connected")
+            debug(logging_queue, "Braccio not connected")
     else:
-        debug(debug_queue, "Braccio not configured")
+        debug(logging_queue, "Braccio not configured")
 
-def braccio_gripper(braccio: Optional[BraccioInterface], debug_queue: Queue, gripper: Gripper):
+def braccio_gripper(braccio: Optional[BraccioInterface], logging_queue: LoggingQueue, gripper: Gripper):
     if braccio:
         res = braccio.gripper(gripper)
         if res:
             if res[0]:
-                debug(debug_queue, f"Braccio command executed in {round(res[2], 2)}s.")
+                debug(logging_queue, f"Braccio command executed in {round(res[2], 2)}s.")
             else:
-                debug(debug_queue, f"Braccio command error: {res[1].name}")
+                debug(logging_queue, f"Braccio command error: {res[1].name}")
         else:
-            debug(debug_queue, "Braccio not connected")
+            debug(logging_queue, "Braccio not connected")
     else:
-        debug(debug_queue, "Braccio not configured")
+        debug(logging_queue, "Braccio not configured")
 
-def debug(debug_queue: Queue, msg: str):
-    debug_queue.put(F"[{datetime.now().isoformat()}] {msg}")
+def debug(logging_queue: LoggingQueue, msg: str):
+    logging_queue.debug(msg)
 
 def reset_touch(tskin: TSkin):
         if tskin.touch_preserve:
@@ -652,7 +653,6 @@ def reset_touch(tskin: TSkin):
 # This is the main function that runs your code. Any
 # code blocks you add to this section will be executed.
 `;
-        
         var statements_body = Blockly.Python.statementToCode(block, 'BODY');
 
         if (!statements_body) {
@@ -663,7 +663,7 @@ def reset_touch(tskin: TSkin):
             return generator.INDENT + "global " + v.name;
         }).join('\n');
 
-        var code = libs + 'def app(tskin: TSkin, keyboard: KeyboardController, braccio: Optional[BraccioInterface], actions: List[ShapesPostAction], debug_queue: Queue):\n' + 
+        var code = libs + 'def app(tskin: TSkin, keyboard: KeyboardController, braccio: Optional[BraccioInterface], actions: List[ShapesPostAction], logging_queue: LoggingQueue):\n' + 
             variables + '\n' + "\n" +
             Blockly.Python.INDENT + "gesture = tskin.gesture\n" +
             Blockly.Python.INDENT + "touch = tskin.touch\n" +
@@ -674,7 +674,7 @@ def reset_touch(tskin: TSkin):
 
     python.pythonGenerator.forBlock['tactigon_shape_debug'] = function (block, generator) {
         var message = generator.valueToCode(block, 'TEXT', python.Order.ATOMIC);
-        var code = `debug(debug_queue, ${message})\n`;
+        var code = `debug(logging_queue, ${message})\n`;
         return code;
     };
 
@@ -725,7 +725,7 @@ function defineSpeechGenerators(){
             })
             .join(", ");
 
-        var code = `check_speech(tskin, debug_queue, [${args}])`
+        var code = `check_speech(tskin, logging_queue, [${args}])`
         return [code, Blockly.Python.ORDER_ATOMIC];
     };
 }
@@ -785,19 +785,19 @@ function defineBraccioGenerators(){
         var x = generator.valueToCode(block, 'x', python.Order.ATOMIC);
         var y = generator.valueToCode(block, 'y', python.Order.ATOMIC);
         var z = generator.valueToCode(block, 'z', python.Order.ATOMIC);
-        var code = `braccio_move(braccio, debug_queue, ${x}, ${y}, ${z})\n`;
+        var code = `braccio_move(braccio, logging_queue, ${x}, ${y}, ${z})\n`;
         return code;
     };
 
     python.pythonGenerator.forBlock['braccio_wrist'] = function (block, generator) {
         var x = block.getFieldValue('wrist');
-        var code = `braccio_wrist(braccio, debug_queue, Wrist['${x}'])\n`;
+        var code = `braccio_wrist(braccio, logging_queue, Wrist['${x}'])\n`;
         return code;
     };
 
     python.pythonGenerator.forBlock['braccio_gripper'] = function (block, generator) {
         var x = block.getFieldValue('gripper');
-        var code = `braccio_gripper(braccio, debug_queue, Gripper['${x}'])\n`;
+        var code = `braccio_gripper(braccio, logging_queue, Gripper['${x}'])\n`;
         return code;
     };
 }

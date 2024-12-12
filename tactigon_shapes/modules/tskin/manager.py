@@ -8,7 +8,7 @@ from .models import TSkin, TSkinConfig, GestureConfig, TSkinModel, VoiceConfig, 
 TSKIN_EXTENSION = "tskin"
 
 def load_tskin(config: TSkinConfig, voice: Optional[VoiceConfig]):
-    current_app.extensions[TSKIN_EXTENSION] = TSkin(config, voice, True)
+    current_app.extensions[TSKIN_EXTENSION] = TSkin(config, voice)
 
 def start_tskin():
     tskin = get_tskin()
@@ -68,7 +68,7 @@ if sys.platform == "win32":
         return VoiceConfig(
             path.join("speech", "deepspeech-0.9.3-models.tflite"),
             path.join("speech", "shapes.scorer"),
-            voice_timeout=3,
+            voice_timeout=8,
             silence_timeout=3,
             voice_commands=TSpeechObject(
                 [
