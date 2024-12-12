@@ -145,12 +145,18 @@
 <div id="braccio-management" class="d-flex gap-3 m-2">
     <div class="gap-1">
         <i class="mi-round mi-precision-manufacturing" style="font-size: 20px;"></i>
-        <small>{{ config.name }}</small>
+        {% if config %}
+            <small>{{ config.name }}</small>
+        {% else %}
+            <small style="color: gray;">Not configured</small>
+        {% endif %}
     </div>
-    <div>
-        <i class="mi-round mi-bluetooth-connected connected d-none" style="font-size: 20px; color: #fff;"></i>
-        <i class="mi-round mi-bluetooth disconnected" style="font-size: 20px; color: gray;"></i>
-    </div>
+    {% if config %}
+        <div>
+            <i class="mi-round mi-bluetooth-connected connected d-none" style="font-size: 20px; color: #fff;"></i>
+            <i class="mi-round mi-bluetooth disconnected" style="font-size: 20px; color: gray;"></i>
+        </div>
+    {% endif %}
 </div>
 {% endmacro %}
 
@@ -184,33 +190,26 @@
     <div class="sticky-top">
         <nav class="bg-dark text-light">
             <div class="container-fluid d-flex justify-content-end align-items-center gap-3">
-                {% if braccio_config %}
-                    {{ braccio(braccio_config) }}
-                {% endif %}
-                {% if tskin_config %}
-                    {{tskin(tskin_config)}}
-                {% endif %}
+                | {{ braccio(braccio_config) }} | {{tskin(tskin_config)}}
             </div>
         </nav>
         <!--- Navbar app -->
         <nav class="navbar bg-tskin">
             <div class="container-fluid">
-                <a href="{{ url_for('main.index') }}" class="btn btn-link text-decoration-none text-light" title="Homepage">
-                    <i class="mi-round mi-home" style="font-size: 24px"></i>
+                <a href="{{ url_for('shapes.index') }}" class="btn btn-link text-decoration-none text-light" title="Shapes">
+                    <i class="mi-round mi-extension" style="font-size: 24px"></i>
                 </a>
                 <div>
-                    <a href="{{ url_for('shapes.index') }}" class="btn btn-link text-decoration-none text-light" title="Shapes">
-                        <i class="mi-round mi-extension" style="font-size: 24px"></i>
-                    </a>
+                    
                     {% if has_braccio %}
                         <a href="{{ url_for('braccio.index') }}" class="btn btn-link text-decoration-none text-light" title="Braccio">
                             <i class="mi-round mi-precision-manufacturing" style="font-size: 24px"></i>
                         </a>
                     {% endif %}
-                    <button class="btn btn-link text-decoration-none text-light" title="Device status"
+                    <button class="btn btn-link text-decoration-none text-light" title="Tactigon Skin"
                         data-bs-toggle="offcanvas" data-bs-target="#panel_device_connection"
                         aria-controls="offcanvasScrolling">
-                        <i class="mi-round mi-bluetooth" style="font-size: 24px"></i>
+                        <img src="{{ url_for('static', filename='images/tactigon.png') }}" width="24" height="24">
                     </button>
                     <a href="{{ url_for('main.settings') }}" class="btn btn-link text-decoration-none text-light" title="Settings">
                         <i class="mi-round mi-settings" style="font-size: 24px"></i>
