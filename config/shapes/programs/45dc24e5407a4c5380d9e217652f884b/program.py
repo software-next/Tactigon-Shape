@@ -1,5 +1,4 @@
-positions = None
-wrist_pos = None
+# Shapes by Next Industries
 
 import time
 from datetime import datetime
