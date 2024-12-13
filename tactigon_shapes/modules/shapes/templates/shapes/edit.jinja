@@ -350,7 +350,26 @@
             </block>
         </category>
         <category name="Voice" colour="#EB6152">
-            <block type="tskin_take_voice">
+            <block type="tskin_listen">
+            </block>
+            <block type="tskin_record">
+                <value name="filename">
+                    <shadow type="text">
+                        <field name="TEXT">audio.wav</field>
+                    </shadow>
+                </value>
+                <value name="seconds">
+                    <shadow type="math_number">
+                        <field name="NUM">5</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="tskin_play">
+                <value name="filename">
+                    <shadow type="text">
+                        <field name="TEXT">audio.wav</field>
+                    </shadow>
+                </value>
             </block>
         </category> 
         <sep></sep>
@@ -458,7 +477,6 @@
     }
 
     function setGeneratedCode(workspace) {
-        debugger;
         Blockly.Python.addReservedWords('code');
         const code = python.pythonGenerator.workspaceToCode(workspace);
         let origin = code.indexOf("# Shapes");
@@ -479,8 +497,15 @@
         const workspace = initializeBlockly();
 
         $('#update-program-form').on('submit', (e) => {
-            setGeneratedCode(workspace);
-            setState(workspace);
+            try{
+                setGeneratedCode(workspace);
+                setState(workspace);
+            } catch(ex){
+                e.preventDefault();
+                console.log(ex);
+                return false;
+            }
+            return true;
         });
     });
 </script>

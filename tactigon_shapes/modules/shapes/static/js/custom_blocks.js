@@ -203,40 +203,65 @@ function loadSpeechBlocks(speechs) {
         }
     }
 
-    Blockly.Blocks['tskin_take_voice'] = {
+    Blockly.Blocks['tskin_listen'] = {
         init: function(){
             this.jsonInit({
-                "type": "tskin_take_voice",
+                "type": "tskin_listen",
                 "message0": message,
                 'args0': args,
-                "output": "Boolean",
+                "output": "List",
                 "colour": "#EB6152",
-                "tooltip": "Get Tactigon Skin voice",
+                "tooltip": "Use Tactigon Skin to listen for commands",
                 "helpUrl": ""
             });
-        },
-        // onchange: function(p1){
-        //     if (p1.name && p1.name.indexOf("speech_") > -1) {
-        //         if (this.inputList[0].fieldRow.length > 1){
-        //             let current_index = parseInt(p1.name.replace("speech_", ""));
+        }
+    };
 
-        //             while (this.inputList[0].fieldRow.length > current_index + 1){
-        //                 this.inputList[0].removeField("speech_" + (this.inputList[0].fieldRow.length - 1))
-        //             }
-        //         }
+    Blockly.Blocks['tskin_record'] = {
+        init: function () {
+            this.jsonInit({
+                "type": "tskin_record",
+                "message0": "Record on %1 for %2 seconds",
+                "args0": [
+                    {
+                        "type": "input_value",
+                        "name": "filename",
+                        "check": "String"
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "seconds",
+                        "check": "Number"
+                    }
+                ],
+                "previousStatement": null,
+                "nextStatement": null,
+                "colour": "#EB6152",
+                "tooltip": "Use Tactigon Skin to record audio",
+                "helpUrl": ""
+            });
+        }
+    };
 
-        //         if (p1.newValue == "") return;
-
-        //         levels = this.inputList[0].fieldRow.map((r) => { return r["selectedOption"][1].split("_")[0] }).filter((l) => l != "");
-        //         $.getJSON(speech_api, {levels: levels.join("_")})
-        //             .done(data => {
-        //                 if (data.next_speechs && data.next_speechs.length > 1){
-        //                     this.inputList[0].appendField(new Blockly.FieldDropdown(data.next_speechs), "speech_" + levels.length.toString())
-        //                 }
-        //             }
-        //         );
-        //     }
-        // }
+    Blockly.Blocks['tskin_play'] = {
+        init: function () {
+            this.jsonInit({
+                "type": "tskin_play",
+                "message0": "Play file audio %1",
+                "args0": [
+                    {
+                        "type": "input_value",
+                        "name": "filename",
+                        "check": "String"
+                    }
+                ],
+                "previousStatement": null,
+                "nextStatement": null,
+                "colour": "#EB6152",
+                "tooltip": "Use Tactigon Skin to play audio",
+                "helpUrl": ""
+            });
+        }
     };
 }
 
@@ -596,6 +621,12 @@ def check_speech(tskin: TSkin, logging_queue: LoggingQueue, hotwords: List[Union
     debug(logging_queue, "Cannot listen...")
     return []
 
+def record_audio(tskin: TSkin, filename: str, seconds: float):
+    tskin.record(filename, seconds)
+
+    while tskin.is_recording:
+        time.sleep(tskin.TICK)
+
 def keyboard_press(keyboard: KeyboardController, commands: List[KeyCode]):
     for k in commands:
         _k = k.char if isinstance(k, KeyCode) and k.char else k
@@ -713,8 +744,7 @@ function defineTSkinGenerators(){
 }
 
 function defineSpeechGenerators(){
-    python.pythonGenerator.forBlock['tskin_take_voice'] = function (block, generator) {
-        debugger;
+    python.pythonGenerator.forBlock['tskin_listen'] = function (block) {
         let args = block.inputList[0].fieldRow
             .filter((f) => f.selectedOption && f.selectedOption[1] != "")
             .map((f) => {
@@ -727,6 +757,20 @@ function defineSpeechGenerators(){
 
         var code = `check_speech(tskin, logging_queue, [${args}])`
         return [code, Blockly.Python.ORDER_ATOMIC];
+    };
+
+    python.pythonGenerator.forBlock['tskin_record'] = function (block, generator) {
+        debugger;
+        let filename = generator.valueToCode(block, 'filename', python.Order.ATOMIC);
+        let seconds = generator.valueToCode(block, 'seconds', python.Order.ATOMIC);
+
+        return `record_audio(tskin, ${filename}, ${seconds})\n`
+    };
+
+    python.pythonGenerator.forBlock['tskin_play'] = function (block, generator) {
+        let filename = generator.valueToCode(block, 'filename', python.Order.ATOMIC);
+
+        return `tskin.play(${filename})\n`
     };
 }
 
