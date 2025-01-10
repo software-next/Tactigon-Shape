@@ -205,7 +205,7 @@ We'll walk you through how to create the block and handle the Python code genera
 ![image](https://github.com/user-attachments/assets/711d0e14-5972-4583-bb06-41b1fcb64ad7)
 
 4. **Write Custom Code for the Block**  
-   - You can create custom Python code for your block in the [Custom blocks file](https://github.com/TactigonTeam/Tactigon-Shape/blob/master/tactigon_shapes/modules/shapes/static/js/custom_blocks.js) page in the **Shapes** module.
+   - You can write custom Python code for your block in the [Custom blocks file](https://github.com/TactigonTeam/Tactigon-Shape/blob/master/tactigon_shapes/modules/shapes/static/js/custom_blocks.js) page in the **Shapes** module.
    - From Tactigon Shapes you can generate code in JavaScript, Python, PHP, or Dart based on the visual blocks. But we recommend using Python because almost all of our projects speak Python. 
 ```python
     python.pythonGenerator.forBlock['to_uppercase'] = function(block) {
