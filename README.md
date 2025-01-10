@@ -19,7 +19,7 @@ Tactigon Shapes simplifies programming by allowing you to build logic visually i
 - Visual Programming: Drag-and-drop interface that helps users understand programming concepts.
 - Code Generation: Automatically generates code in multiple programming languages.
 - Customizable: You can create your own blocks and define their behavior.
-- 
+  
 ## Tactigon Ecosystem
 
 Tactigon ecosystem is consists of:
