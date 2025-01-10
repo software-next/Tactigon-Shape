@@ -165,7 +165,7 @@ We'll walk you through how to create the block and handle the Python code genera
    - If you want to organize your blocks, you can create a new category or assign your block to an existing category.  
    - To create a new category, go to the [Edit](https://github.com/TactigonTeam/Tactigon-Shape/blob/master/tactigon_shapes/modules/shapes/templates/shapes/edit.jinja) page in the **Shape** module.
 
-```
+```Html
   <category name="To Uppercase" colour="#f1c40f ">
       <block type="to_uppercase">
       </block>
@@ -207,7 +207,7 @@ We'll walk you through how to create the block and handle the Python code genera
 4. **Write Custom Code for the Block**  
    - You can create custom Python code for your block in the [Custom blocks file](https://github.com/TactigonTeam/Tactigon-Shape/blob/master/tactigon_shapes/modules/shapes/static/js/custom_blocks.js) page in the **Shapes** module.
    - From Tactigon Shapes you can generate code in JavaScript, Python, PHP, or Dart based on the visual blocks. But we recommend using Python because almost all of our projects speak Python. 
-```
+```python
     python.pythonGenerator.forBlock['to_uppercase'] = function(block) {
         var text_to_print = Blockly.Python.valueToCode(block, 'TEXT', Blockly.Python.ORDER_ATOMIC) || "''";
         var code = `debug(logging_queue, ${text_to_print}.upper())\n`;
