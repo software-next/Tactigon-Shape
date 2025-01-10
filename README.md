@@ -1,6 +1,6 @@
 # Tactigon Shapes
 
-Tactigon Shapes is an extension of [Blockly](https://developers.google.com/blockly) which is a project by Google and it allows you to create visual, drag-and-drop block-based programming interfaces. Instead of typing code, you can create programs by connecting blocks together. This README provides an overview of the project, its features, installation instructions, and guidance on contributing. From Tactigon Shapes you can generate code in JavaScript, Python, PHP, or Dart based on the visual blocks. But we recommend using Python because almost all of our projects speak Python. 
+Tactigon Shapes is an extension of [Blockly](https://developers.google.com/blockly) which is a project by Google and it allows you to create visual, drag-and-drop block-based programming interfaces. Instead of typing code, you can create programs by connecting blocks together. This README provides an overview of the project, its features, installation instructions, and guidance on contributing.
 
 ## Table of Contents
 1. [Introduction](#introduction)
@@ -206,6 +206,7 @@ We'll walk you through how to create the block and handle the Python code genera
 
 4. **Write Custom Code for the Block**  
    - You can create custom Python code for your block in the [Custom blocks file](https://github.com/TactigonTeam/Tactigon-Shape/blob/master/tactigon_shapes/modules/shapes/static/js/custom_blocks.js) page in the **Shapes** module.
+   - From Tactigon Shapes you can generate code in JavaScript, Python, PHP, or Dart based on the visual blocks. But we recommend using Python because almost all of our projects speak Python. 
 ```
     python.pythonGenerator.forBlock['to_uppercase'] = function(block) {
         var text_to_print = Blockly.Python.valueToCode(block, 'TEXT', Blockly.Python.ORDER_ATOMIC) || "''";
