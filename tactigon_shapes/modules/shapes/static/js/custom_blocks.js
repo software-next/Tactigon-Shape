@@ -791,7 +791,7 @@ def braccio_gripper(braccio: Optional[BraccioInterface], logging_queue: LoggingQ
         debug(logging_queue, "Braccio not configured")
 
 def debug(logging_queue: LoggingQueue, msg: str):
-    logging_queue.debug(msg)
+    logging_queue.debug(str(msg))
 
 def reset_touch(tskin: TSkin):
         if tskin.touch_preserve:
