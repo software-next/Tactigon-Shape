@@ -3,26 +3,14 @@
 Tactigon Shapes is an extension of [Blockly](https://developers.google.com/blockly) which is a project by Google and it allows you to create visual, drag-and-drop block-based programming interfaces. Instead of typing code, you can create programs by connecting blocks together. This README provides an overview of the project, its features, installation instructions, and guidance on contributing.
 
 ## Table of Contents
-- [Tactigon Shapes](#tactigon-shapes)
-  - [Table of Contents](#table-of-contents)
-  - [Introduction](#introduction)
-  - [Key Features:](#key-features)
-  - [Tactigon Ecosystem](#tactigon-ecosystem)
-  - [Installation](#installation)
-    - [Prerequisites](#prerequisites)
-    - [Steps to Install:](#steps-to-install)
-  - [](#)
-  - [Running Tactigon Shapes](#running-tactigon-shapes)
-  - [](#-1)
-  - [Using Tactigon Shapes](#using-tactigon-shapes)
-  - [How to use Shapes](#how-to-use-shapes)
-    - [Creating a New Shape:](#creating-a-new-shape)
-    - [Editing an Existing Shape:](#editing-an-existing-shape)
-    - [Run Your First Shape](#run-your-first-shape)
-    - [Deleting a Shape:](#deleting-a-shape)
-  - [Creating Custom Blocks](#creating-custom-blocks)
-    - [Steps to Create Custom Blocks:](#steps-to-create-custom-blocks)
-  - [Contributing](#contributing)
+1. [Introduction](#introduction)
+2. [Key Features](#key-features)
+3. [Tactigon Ecosystem](#tactigon-ecosystem)
+4. [Installation](#installation)
+5. [Running Tactigon Shapes](#running-tactigon-shapes)
+6. [Using Tactigon Shapes](#using-tactigon-shapes)
+7. [Creating Custom Blocks](#creating-custom-blocks)
+8. [Contributing](#contributing)
 
 ## Introduction
 Tactigon Shapes simplifies programming by allowing you to build logic visually instead of writing code. This project is ideal for beginners, educators, and developers who want to create fast prototypes using gesture recognition and voice commands using Tactigon Ecosystem.
