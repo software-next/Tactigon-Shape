@@ -128,7 +128,8 @@ https://github.com/user-attachments/assets/a1450158-5b35-4e3e-aeb9-6cf5b2f47f26
 ### Deleting a Shape:
 - Click the **bin** icon next to the shape name to delete it.
   
-![image](https://github.com/user-attachments/assets/ccdb6c47-4b53-4894-a19b-7ac307c63a00)
+![image](https://github.com/user-attachments/assets/7105f02f-e345-4081-84d2-3ff5dff262bc)
+
 
 ## Creating Custom Blocks
 
