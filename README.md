@@ -69,7 +69,7 @@ Open the Visual Studio Installer on your system. if you do not have one, [Downlo
 
    We have created an install file (install.bat - windows / install.sh - Linux, macOS) to configure everything for you. Please execute that file; you will see the following output on your terminal.
 
-![Code_qqhZQAox9V](https://github.com/user-attachments/assets/c7353d9b-3e97-4e1c-a0d3-89304dc9b99a)
+![image](https://github.com/user-attachments/assets/e2b37b37-2f24-44e6-bab1-22191465d591)
 
 <br>
 <br>
