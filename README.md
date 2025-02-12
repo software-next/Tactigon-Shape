@@ -3,14 +3,26 @@
 Tactigon Shapes is an extension of [Blockly](https://developers.google.com/blockly) which is a project by Google and it allows you to create visual, drag-and-drop block-based programming interfaces. Instead of typing code, you can create programs by connecting blocks together. This README provides an overview of the project, its features, installation instructions, and guidance on contributing.
 
 ## Table of Contents
-1. [Introduction](#introduction)
-2. [Key Features](#key-features)
-3. [Tactigon Ecosystem](#tactigon-ecosystem)
-4. [Installation](#installation)
-5. [Running Tactigon Shapes](#running-tactigon-shapes)
-6. [Using Tactigon Shapes](#using-tactigon-shapes)
-7. [Creating Custom Blocks](#creating-custom-blocks)
-8. [Contributing](#contributing)
+- [Tactigon Shapes](#tactigon-shapes)
+  - [Table of Contents](#table-of-contents)
+  - [Introduction](#introduction)
+  - [Key Features:](#key-features)
+  - [Tactigon Ecosystem](#tactigon-ecosystem)
+  - [Installation](#installation)
+    - [Prerequisites](#prerequisites)
+    - [Steps to Install:](#steps-to-install)
+  - [](#)
+  - [Running Tactigon Shapes](#running-tactigon-shapes)
+  - [](#-1)
+  - [Using Tactigon Shapes](#using-tactigon-shapes)
+  - [How to use Shapes](#how-to-use-shapes)
+    - [Creating a New Shape:](#creating-a-new-shape)
+    - [Editing an Existing Shape:](#editing-an-existing-shape)
+    - [Run Your First Shape](#run-your-first-shape)
+    - [Deleting a Shape:](#deleting-a-shape)
+  - [Creating Custom Blocks](#creating-custom-blocks)
+    - [Steps to Create Custom Blocks:](#steps-to-create-custom-blocks)
+  - [Contributing](#contributing)
 
 ## Introduction
 Tactigon Shapes simplifies programming by allowing you to build logic visually instead of writing code. This project is ideal for beginners, educators, and developers who want to create fast prototypes using gesture recognition and voice commands using Tactigon Ecosystem.
@@ -37,14 +49,12 @@ To set the required tools on your system, follow the steps below:
 
   - CPU with AVX/FMA support
     - To check if your Mac supports **AVX/FMA** you can go to **About This Mac**. Check the CPU model and verify its features online.
-  - Git [Download Git](https://git-scm.com/downloads)
   - Python 3.8.10 [Download Python 3.8.10](https://www.python.org/downloads/release/python-3810/)
 
 - **Windows:**
 To set up the required tools on your Windows 10 or Windows 11 operating system, follow the steps below:
   - CPU with AVX/FMA support
     - To check if your CPU supports AVX/FMA you can press **Win + R** then type **msinfo32** and press Enter. Check the CPU model and verify its features online.
-  - Git [Download Git](https://git-scm.com/downloads)
   - Python 3.8.10 [Download Python 3.8.10](https://www.python.org/downloads/release/python-3810/)
   - Microsoft C++ Build Tools and Windows 10/11 SDK. 
 
@@ -58,41 +68,19 @@ Open the Visual Studio Installer on your system. if you do not have one, [Downlo
 ![Screenshot 2024-11-21 162339](https://github.com/user-attachments/assets/5f6332f1-be2b-4fee-ad62-7feb734db710)
 
 ### Steps to Install:
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/TactigonTeam/Tactigon-Shape.git
-   ```
+1. Download the repository:
 
-![image](https://github.com/user-attachments/assets/bc9664eb-ba03-4ad4-b11d-9f29fcdd2289)
-<br>
-<br>
-<br>
-<br>
-![image](https://github.com/user-attachments/assets/7027d8b3-9388-4f67-a7f9-fb967fa49b1d)
+![image](https://github.com/user-attachments/assets/400b4ff5-a90e-48e1-af2e-420abd375346)
    
-3. Navigate to the project directory:
+2. Pick a location and extract all the files. you will see a folder named **Tactigon-Shape-master**.
+
+2. Navigate to the project directory or open the project with your default code editor or IDE:
    ```bash
-   cd Tactigon-Shape
+   cd Tactigon-Shape-master
    ```
-4. Create a Python virtual environment:
-   ```bash
-   python -m venv venv
-   ```
-5. Activate the virtual environment:
-   - **Mac/Linux:**
-     ```bash
-     source venv/bin/activate
-     ```
-   - **Windows:**
-     ```bash
-     .\venv\Scripts\activate
-     ```
-6. Install dependencies:
-   ```bash
-   pip install flask==3.0.3 flask_socketio==5.3.6 gevent==24.2.1 tactigon_gear==5.2.0 PyAudio==0.2.13 pynput==1.7.7 sympy==1.13.2
-   pip install deepspeech-tflite==0.9.3 --no-deps
-   pip install tactigon_speech==5.0.8.post1 --no-deps
-   ```
+3. Activate the virtual environment and Install dependencies:
+
+   We have created an install file (install.bat - windows / install.sh - Linux, macOS) to configure everything for you. Please execute that file; you will see the following output on your terminal.
 
 ![image](https://github.com/user-attachments/assets/94d27fbe-58fe-4519-9127-b97bac8677c5)
 <br>
