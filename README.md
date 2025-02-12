@@ -69,11 +69,10 @@ Open the Visual Studio Installer on your system. if you do not have one, [Downlo
 
    We have created an install file (install.bat - windows / install.sh - Linux, macOS) to configure everything for you. Please execute that file; you will see the following output on your terminal.
 
-![image](https://github.com/user-attachments/assets/94d27fbe-58fe-4519-9127-b97bac8677c5)
+![Code_qqhZQAox9V](https://github.com/user-attachments/assets/c7353d9b-3e97-4e1c-a0d3-89304dc9b99a)
+
 <br>
 <br>
-<br>
----
 
 ## Running Tactigon Shapes 
 1. Run the main Python script:
@@ -86,7 +85,7 @@ Open the Visual Studio Installer on your system. if you do not have one, [Downlo
    ```
 3. Follow the prompts to connect to your Tactigon Skin device and start using the Shapes interface.
 
-![image](https://github.com/user-attachments/assets/e576893d-e499-4b2f-aeae-d825a4102087)
+![chrome_GBrADG4C6r](https://github.com/user-attachments/assets/30107a15-e4ca-424d-80c2-bca73e3c0370)
 ---
 
 ## Using Tactigon Shapes
@@ -95,7 +94,7 @@ Using Shapes is like building with LEGO bricks, you drag, drop, and connect piec
 
 Once you are on the Shape interface, you can see some of our example shapes, such as Powerpoint, Braccio voice, and so on. On the left side, you will see all your shapes, and on the right side, you can see the snapshot of your shape.
 
-![image](https://github.com/user-attachments/assets/4449bfb8-4473-467d-8231-e9a83dfc53fa)
+![chrome_0Pi7DpjX6l](https://github.com/user-attachments/assets/0bb63989-c89a-4e04-9067-00f585e86e09)
 
 
 ## How to use Shapes
@@ -108,7 +107,8 @@ Once you are on the Shape interface, you can see some of our example shapes, suc
 4. Drag blocks from the left pane to the workspace to build your logic.
 5. Click **Save** to save your shape.
 
-https://github.com/user-attachments/assets/65e7d149-e559-4a5b-a746-5a0868d2227e
+https://github.com/user-attachments/assets/236e746c-a9f9-4f51-833e-472dd02bc227
+
 
 ### Editing an Existing Shape:
 1. Select a shape from the homepage.
@@ -117,13 +117,13 @@ https://github.com/user-attachments/assets/65e7d149-e559-4a5b-a746-5a0868d2227e
 
 Think of blocks like puzzle pieces. This means you can now connect them by dragging one block and placing it under or inside another block. However, ensure that your shapes snap together; otherwise, the program will not execute.
 
-https://github.com/user-attachments/assets/d8b41a1d-e9d1-4bbe-afb6-de68e38764ab
+https://github.com/user-attachments/assets/f00c5e2a-0cc2-4bfc-b50b-51d4f147f755
 
 ### Run Your First Shape
 - When you are done building, click the toggle button to see what your program does.
 - You will see a page with both your shape and the terminal with the output.
 
-https://github.com/user-attachments/assets/6cc84398-4954-4650-b0ad-2eb0e861bfb6
+https://github.com/user-attachments/assets/a1450158-5b35-4e3e-aeb9-6cf5b2f47f26
 
 ### Deleting a Shape:
 - Click the **bin** icon next to the shape name to delete it.
@@ -177,7 +177,7 @@ We'll walk you through how to create the block and handle the Python code genera
    - Paste the JSON code into the [Custom blocks file](https://github.com/TactigonTeam/Tactigon-Shape/blob/master/tactigon_shapes/modules/shapes/static/js/custom_blocks.js) page in the **Shapes** module.  
    - After adding it, you will see both the new category (if created) and the new block in the Tactigon Shapes workspace.
 
-![image](https://github.com/user-attachments/assets/711d0e14-5972-4583-bb06-41b1fcb64ad7)
+![chrome_innQ8Zb8cg](https://github.com/user-attachments/assets/f993507d-b862-45f8-9bb3-c88f60cf46b7)
 
 4. **Write Custom Code for the Block**  
    - You can write custom Python code for your block in the [Custom blocks file](https://github.com/TactigonTeam/Tactigon-Shape/blob/master/tactigon_shapes/modules/shapes/static/js/custom_blocks.js) page in the **Shapes** module.
@@ -193,11 +193,11 @@ We'll walk you through how to create the block and handle the Python code genera
 5. **Run and Test**  
    - After creating your block, rerun the project and test your block by running your shape.
 
-![image](https://github.com/user-attachments/assets/f71ef35e-48df-4880-a7dd-e257b713105b)
+![chrome_32A8gvnK5J](https://github.com/user-attachments/assets/3af28103-b8f7-4981-96a6-72fb9a97ff3a)
 
 Here we have attached a demo video about how to create your own block in the Tactigon Shapes project.
 
-https://github.com/user-attachments/assets/f0057429-2cc8-4c83-92eb-250ed9f52483
+https://github.com/user-attachments/assets/d420dd2d-30e9-48e7-b07b-90c5ae0e3bd6
 
 ---
 
