@@ -57,8 +57,7 @@ Open the Visual Studio Installer on your system. if you do not have one, [Downlo
 
 ### Steps to Install:
 1. Download the repository:
-
-![image](https://github.com/user-attachments/assets/400b4ff5-a90e-48e1-af2e-420abd375346)
+![Immagine 2025-02-12 101837](https://github.com/user-attachments/assets/4065de26-cb74-453f-9c3f-32497c698408)
    
 2. Pick a location and extract all the files. you will see a folder named **Tactigon-Shape-master**.
 
