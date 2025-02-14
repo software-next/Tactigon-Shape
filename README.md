@@ -130,6 +130,20 @@ https://github.com/user-attachments/assets/a1450158-5b35-4e3e-aeb9-6cf5b2f47f26
   
 ![image](https://github.com/user-attachments/assets/7105f02f-e345-4081-84d2-3ff5dff262bc)
 
+### How to run our Tactigon Shapes:
+We’re diving into how you can control PowerPoint presentations with just a few simple gestures. Let’s get started!
+
+First things first, make sure your TSkin is connected to the Tactigon Shapes app. You’ll know it’s connected when you see the battery percentage and the Bluetooth icon in white. If it’s gray, you’re not connected yet. On the left panel, you’ll find our default shapes, plus a couple of extras we’ve added to show off the possibilities.
+Now, let’s talk about PowerPoint control. 
+
+Here’s how it works: When you tap and hold, it toggles the presentation into full-screen mode. A single tap takes you to the previous slide, and a twist gesture moves you to the next slide. It’s super intuitive and easy to use.
+I’ve got a basic PowerPoint open with a few slides. I’ll open the Tactigon Shapes app, click the toggle icon to start the program, and you’ll see both your shape and the output on the same screen.
+
+Now, I’ll wear the TSkin and open the PowerPoint app. Watch this—tap and hold, the presentation goes full screen. if you want to move to the next slide do twist gesture. Need to go back? A single tap does the trick. 
+
+Ater your presentation, don’t forget to stop the program after your awesome presentation.
+
+https://github.com/user-attachments/assets/62b4bb7d-c922-421f-8bdd-c856ba587669
 
 ## Creating Custom Blocks
 
