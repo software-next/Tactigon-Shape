@@ -47,11 +47,19 @@ To set up the required tools on your Windows 10 or Windows 11 operating system, 
   - Microsoft C++ Build Tools and Windows 10/11 SDK. 
 
 - **Microsoft C++ Build Tools and Windows 10/11 SDK installation:**
-Open the Visual Studio Installer on your system. if you do not have one, [Download Visual Studio Installer](https://visualstudio.microsoft.com/downloads/)
-  - From the Visual Studio Installer, click Modify or select Install for new installation.
-  - Go to the individual components tab and install the latest version 
-    - MSVC v143 - VS 2022 C++ Build Tools x64/x86 (latest version)
-    - Windows 10/11 SDK (latest version matching your Windows version)
+  - Get the Visual Studio Installer:
+    - If you don’t already have it, [Download Visual Studio Installer](https://visualstudio.microsoft.com/downloads/)  from Microsoft’s website.
+  - Open the Installer:
+    - Run the installer. You’ll see options to add or update tools.
+  - Choose What to Install:
+    - Click Modify (if you already have Visual Studio installed) or Install (for a new setup).
+  - Pick the Right Tools:
+    - Go to the Individual Components tab.
+    - Check these two boxes:
+      - MSVC v143 - VS 2022 C++ Build Tools x64/x86 (latest version)
+      - Windows 10/11 SDK (pick the newest version that matches your Windows version, e.g., Windows 11 users choose the Windows 11 SDK).
+  - Finish Installation:
+    - Click Install/Update and wait for the process to complete.
 
 ![Screenshot 2024-11-21 162339](https://github.com/user-attachments/assets/5f6332f1-be2b-4fee-ad62-7feb734db710)
 
