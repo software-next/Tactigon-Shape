@@ -1,6 +1,6 @@
 # Tactigon Shapes
 
-Tactigon Shapes is an extension of [Blockly](https://developers.google.com/blockly) which is a project by Google and it allows you to create visual, drag-and-drop block-based programming interfaces. Instead of typing code, you can create programs by connecting blocks together. This README provides an overview of the project, its features, installation instructions, and guidance on contributing.
+Tactigon Shapes is an extension of [Blockly](https://developers.google.com/blockly), which is a project by Google and that allows you to create visual, drag-and-drop block-based programming interfaces. Instead of typing code, you can create programs by connecting blocks together. This README provides an overview of the project, its features, installation instructions, and guidance on contributing.
 
 ## Table of Contents
 1. [Introduction](#introduction)
@@ -13,7 +13,7 @@ Tactigon Shapes is an extension of [Blockly](https://developers.google.com/block
 8. [Contributing](#contributing)
 
 ## Introduction
-Tactigon Shapes simplifies programming by allowing you to build logic visually instead of writing code. This project is ideal for beginners, educators, and developers who want to create fast prototypes using gesture recognition and voice commands using Tactigon Ecosystem.
+Tactigon Shapes simplifies programming by allowing you to build logic visually instead of writing code. This project is ideal for beginners, educators, and developers who want to create fast prototypes using gesture recognition and voice commands using the Tactigon Ecosystem.
 
 ## Key Features:
 - Visual Programming: Drag-and-drop interface that helps users understand programming concepts.
@@ -22,7 +22,7 @@ Tactigon Shapes simplifies programming by allowing you to build logic visually i
   
 ## Tactigon Ecosystem
 
-Tactigon ecosystem is consists of:
+Tactigon ecosystem consists of:
  - [Tactigon Gear](https://pypi.org/project/tactigon-gear/) to connect to a Tactigon Skin wearable device and do gesture recognition
  - [Tactigon Speech](https://pypi.org/project/tactigon-speech/) to implement voice recognition on top of Tactigon Gear
  - [Tactigon Arduino Braccio](https://pypi.org/project/tactigon-arduino-braccio/) to connect to the Arduino Braccio device
@@ -30,7 +30,7 @@ Tactigon ecosystem is consists of:
 ## Installation
 ### Prerequisites
 
-In order to use the Tactigon SDK the following prerequisites need to be observed:
+In order to use the Tactigon SDK, the following prerequisites need to be observed:
 
 - **Mac/Linux:**
 To set the required tools on your system, follow the steps below:
@@ -42,7 +42,7 @@ To set the required tools on your system, follow the steps below:
 - **Windows:**
 To set up the required tools on your Windows 10 or Windows 11 operating system, follow the steps below:
   - CPU with AVX/FMA support
-    - To check if your CPU supports AVX/FMA you can press **Win + R** then type **msinfo32** and press Enter. Check the CPU model and verify its features online.
+    - To check if your CPU supports AVX/FMA you can press **Win + R**, then type **msinfo32** and press Enter. Check the CPU model and verify its features online.
   - Python 3.8.10 [Download Python 3.8.10](https://www.python.org/downloads/release/python-3810/)
   - Microsoft C++ Build Tools and Windows 10/11 SDK. 
 
@@ -69,13 +69,13 @@ To set up the required tools on your Windows 10 or Windows 11 operating system, 
    
 2. Pick a location and extract all the files. you will see a folder named **Tactigon-Shape-master**.
 
-2. Navigate to the project directory or open the project with your default code editor or IDE:
+2. Navigate to the project directory or open the project with your default code editor or IDE.
    ```bash
    cd Tactigon-Shape-master
    ```
-3. Activate the virtual environment and Install dependencies:
+3. Activate the virtual environment and install dependencies:
 
-   We have created an install file (install.bat - windows / install.sh - Linux, macOS) to configure everything for you. Please execute that file; you will see the following output on your terminal.
+   We have created an install file (install.bat - Windows / install.sh - Linux, macOS) to configure everything for you. Please execute that file; you will see the following output on your terminal.
 
 ![image](https://github.com/user-attachments/assets/e2b37b37-2f24-44e6-bab1-22191465d591)
 
@@ -83,7 +83,7 @@ To set up the required tools on your Windows 10 or Windows 11 operating system, 
 <br>
 
 
-## Running Tactigon Shapes 
+## Start Tactigon Shapes 
 1. Run the main Python script:
    ```bash
    python .\main.py
@@ -101,7 +101,7 @@ To set up the required tools on your Windows 10 or Windows 11 operating system, 
 
 Using Shapes is like building with LEGO bricks, you drag, drop, and connect pieces to create something functional. This section guides you step-by-step on how to use shapes.
 
-Once you are on the Shape interface, you can see some of our example shapes, such as Powerpoint, Braccio voice, and so on. On the left side, you will see all your shapes, and on the right side, you can see the snapshot of your shape.
+Once you are on the Shape interface, you can see some of our example shapes, such as Powerpoint, Braccio voice, and so on. On the left side, you will see all your shapes, and on the right side, you can see a snapshot of your shape.
 
 ![chrome_0Pi7DpjX6l](https://github.com/user-attachments/assets/0bb63989-c89a-4e04-9067-00f585e86e09)
 
@@ -148,7 +148,7 @@ Now, let’s talk about PowerPoint control.
 Here’s how it works: When you tap and hold, it toggles the presentation into full-screen mode. A single tap takes you to the previous slide, and a twist gesture moves you to the next slide. It’s super intuitive and easy to use.
 I’ve got a basic PowerPoint open with a few slides. I’ll open the Tactigon Shapes app, click the toggle icon to start the program, and you’ll see both your shape and the output on the same screen.
 
-Now, I’ll wear the TSkin and open the PowerPoint app. Watch this—tap and hold, the presentation goes full screen. if you want to move to the next slide do twist gesture. Need to go back? A single tap does the trick. 
+Now, I’ll wear the TSkin and open the PowerPoint app. Watch this—tap and hold, the presentation goes full screen. if you want to move to the next slide, do twist gesture. Need to go back? A single tap does the trick. 
 
 Ater your presentation, don’t forget to stop the program after your awesome presentation.
 
@@ -205,7 +205,7 @@ We'll walk you through how to create the block and handle the Python code genera
 
 4. **Write Custom Code for the Block**  
    - You can write custom Python code for your block in the [Custom blocks file](https://github.com/TactigonTeam/Tactigon-Shape/blob/master/tactigon_shapes/modules/shapes/static/js/custom_blocks.js) page in the **Shapes** module.
-   - From Tactigon Shapes you can generate code in JavaScript, Python, PHP, or Dart based on the visual blocks. But we recommend using Python because almost all of our projects speak Python. 
+   - From Tactigon Shapes, you can generate code in JavaScript, Python, PHP, or Dart based on the visual blocks. But we recommend using Python because almost all of our projects speak Python. 
 ```python
     python.pythonGenerator.forBlock['to_uppercase'] = function(block) {
         var text_to_print = Blockly.Python.valueToCode(block, 'TEXT', Blockly.Python.ORDER_ATOMIC) || "''";
@@ -219,7 +219,7 @@ We'll walk you through how to create the block and handle the Python code genera
 
 ![chrome_32A8gvnK5J](https://github.com/user-attachments/assets/3af28103-b8f7-4981-96a6-72fb9a97ff3a)
 
-Here we have attached a demo video about how to create your own block in the Tactigon Shapes project.
+Here, we have attached a demo video about how to create your own block in the Tactigon Shapes project.
 
 https://github.com/user-attachments/assets/d420dd2d-30e9-48e7-b07b-90c5ae0e3bd6
 
