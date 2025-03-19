@@ -89,10 +89,12 @@ To set up the required tools on your Windows 10 or Windows 11 operating system, 
 
 
 ## Start Tactigon Shapes 
- We have created a start file (start.bat - Windows / start.sh - Linux, macOS). Please execute that file; you will see the following output on your terminal.
+We have created a start file (start.bat - Windows / start.sh - Linux, macOS). Please execute that file; you will see the following output on your terminal.
+
+
 
  
-3. Follow the prompts to connect to your Tactigon Skin device and start using the Shapes interface.
+ Follow the prompts to connect to your Tactigon Skin device and start using the Shapes interface.
 
 ![chrome_GBrADG4C6r](https://github.com/user-attachments/assets/30107a15-e4ca-424d-80c2-bca73e3c0370)
 ---
