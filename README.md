@@ -63,6 +63,11 @@ To set up the required tools on your Windows 10 or Windows 11 operating system, 
 
 ![Screenshot 2024-11-21 162339](https://github.com/user-attachments/assets/5f6332f1-be2b-4fee-ad62-7feb734db710)
 
+![image](https://github.com/user-attachments/assets/84992453-3fc3-4808-b3e0-17e734881650)
+
+![image](https://github.com/user-attachments/assets/e5b29bb3-0e81-4daf-98d6-e1c829b409bb)
+
+
 ### Steps to Install:
 1. Download the repository:
 ![Immagine 2025-02-12 101837](https://github.com/user-attachments/assets/4065de26-cb74-453f-9c3f-32497c698408)
