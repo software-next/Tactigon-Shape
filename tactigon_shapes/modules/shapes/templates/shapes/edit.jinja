@@ -331,7 +331,26 @@
                 <field name="DIRECTION">1</field>
             </block>
         </category>
+        <category name="Dictionaries" colour="#000500">
+            <block type="get_dict_property"></block>
+        </category>
         <sep></sep>
+         <category name="Rest API" colour="#6665DD">
+            <block type="send_get_request">
+                <value name="URL">
+                    <shadow type="text">
+                        <field name="TEXT">https://catfact.ninja/fact</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="send_post_request">
+                <value name="URL">
+                    <shadow type="text">
+                        <field name="TEXT">https://catfact.ninja/fact</field>
+                    </shadow>
+                </value>
+            </block>
+        </category>
         <category name="Variables" colour="#a55b80" custom="VARIABLE"></category>
         <category name="Functions" colour="#995ba5" custom="PROCEDURE"></category>
         <sep></sep>
