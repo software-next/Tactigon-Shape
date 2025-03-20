@@ -12,6 +12,84 @@ function loadCustomBlocks(response) {
     loadKeyboardBlocks(funcKeys, modKeys);
     loadBraccioBlocks(wristOptions, gripperOptions);
 
+    Blockly.Blocks['get_dict_property'] = {
+        init: function () {
+            this.jsonInit({
+                "type": "get_dict_property",
+                "message0": "In dictionary %1 Get value for key %2",
+                "args0": [
+                    {
+                        "type": "input_value",
+                        "name": "DICT",
+                        "check": "Dictionary"
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "KEY",
+                        "check": "String"
+                    }
+                ],
+                "output": null,
+                "colour": '#000500',
+                "tooltip": "Get the value for a key in a dictionary",
+                "helpUrl": "",
+                "inputsInline": true
+            });
+        }
+    };
+
+    Blockly.Blocks['send_get_request'] = {
+        init: function () {
+            this.jsonInit({
+                "type": "send_get_request",
+                "message0": "Send Get Request to %1 %2",
+                "args0": [
+                    {
+                        "type": "input_dummy"
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "URL",
+                        "check": "String"
+                    }
+                ],
+                "output": "Dictionary",
+                "colour": '#6665DD',
+                "tooltip": "Send GET request and return the response",
+                "helpUrl": "",
+                "inputsInline": true
+            });
+        }
+    };
+
+    Blockly.Blocks['send_post_request'] = {
+        init: function () {
+            this.jsonInit({
+                "type": "send_post_request",
+                "message0": "Send Post Request to %1 URL %2 Body %3",
+                "args0": [
+                    {
+                        "type": "input_dummy"
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "URL",
+                        "check": "String"
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "BODY",
+                        "check": "String"
+                    }
+                ],
+                "output": "String",
+                "colour": '#6665DD',
+                "tooltip": "Send POST request and return the response",
+                "helpUrl": ""
+            });
+        }
+    };
+
     Blockly.Blocks['tactigon_shape_function'] = {
         init: function () {
             this.jsonInit({
@@ -548,6 +626,7 @@ function defineCustomGenerators() {
 # Shapes by Next Industries
 
 import time
+import requests
 from datetime import datetime
 from tactigon_shapes.modules.shapes.extension import ShapesPostAction, LoggingQueue
 from tactigon_shapes.modules.braccio.extension import BraccioInterface, CommandStatus, Wrist, Gripper
@@ -556,6 +635,51 @@ from pynput.keyboard import Controller as KeyboardController, HotKey, KeyCode
 from typing import List, Optional, Union`;
         
         var libs = `
+
+def send_get_request(url: str):
+    if not url:
+        return "Please enter a valid URL"
+
+    try:
+        response = requests.get(url, timeout=10)
+        response.raise_for_status() 
+
+        content_type = response.headers.get("Content-Type", "").lower()
+
+        if "application/json" in content_type:
+            return response.json()
+        else:
+            return {
+                "text": response.text
+            }
+
+    except requests.exceptions.RequestException as e:
+        return f"An error occurred: {e}"
+    except ValueError as e:
+        return f"Invalid JSON response: {e}"
+
+def send_post_request(url: str, body: str):
+    if not url:
+        return "Please enter a valid URL"
+
+    try:
+        response = requests.post(url,  json=body, timeout=10)
+        response.raise_for_status() 
+
+        content_type = response.headers.post("Content-Type", "").lower()
+
+        if "application/json" in content_type:
+            return response.json()
+        else:
+            return {
+                "text": response.text
+            }
+
+    except requests.exceptions.RequestException as e:
+        return f"An error occurred: {e}"
+    except ValueError as e:
+        return f"Invalid JSON response: {e}"
+
 def check_gesture(gesture: Optional[Gesture], gesture_to_find: str) -> bool:
     if not gesture:
         return False
@@ -675,7 +799,7 @@ def braccio_gripper(braccio: Optional[BraccioInterface], logging_queue: LoggingQ
         debug(logging_queue, "Braccio not configured")
 
 def debug(logging_queue: LoggingQueue, msg: str):
-    logging_queue.debug(msg)
+    logging_queue.debug(str(msg))
 
 def reset_touch(tskin: TSkin):
         if tskin.touch_preserve:
@@ -713,6 +837,8 @@ def reset_touch(tskin: TSkin):
     defineSpeechGenerators();
     defineKeyboardGenerators();
     defineBraccioGenerators();
+    defineDictionaryGenerators();
+    defineRestAPIGenerators();
 }
 
 function defineTSkinGenerators(){
@@ -816,32 +942,60 @@ function defineKeyboardGenerators(){
     };
 
     python.pythonGenerator.forBlock['keyboard_mod_plus_mod_plus_funckey'] = function (block, generator) {
-        var mod1 = block.getFieldValue('mod_key_1');
-        var mod2 = block.getFieldValue('mod_key_2');
-        var func = block.getFieldValue('function_key');
-        var code = `'${mod1}${mod2}${func}'`;
+        const mod1 = block.getFieldValue('mod_key_1');
+        const mod2 = block.getFieldValue('mod_key_2');
+        const func = block.getFieldValue('function_key');
+        const code = `'${mod1}${mod2}${func}'`;
         return [code, Blockly.Python.ORDER_ATOMIC];
     };
 }
 
 function defineBraccioGenerators(){
     python.pythonGenerator.forBlock['braccio_move'] = function (block, generator) {
-        var x = generator.valueToCode(block, 'x', python.Order.ATOMIC);
-        var y = generator.valueToCode(block, 'y', python.Order.ATOMIC);
-        var z = generator.valueToCode(block, 'z', python.Order.ATOMIC);
-        var code = `braccio_move(braccio, logging_queue, ${x}, ${y}, ${z})\n`;
+        const x = generator.valueToCode(block, 'x', python.Order.ATOMIC);
+        const y = generator.valueToCode(block, 'y', python.Order.ATOMIC);
+        const z = generator.valueToCode(block, 'z', python.Order.ATOMIC);
+        const code = `braccio_move(braccio, logging_queue, ${x}, ${y}, ${z})\n`;
         return code;
     };
 
     python.pythonGenerator.forBlock['braccio_wrist'] = function (block, generator) {
-        var x = block.getFieldValue('wrist');
-        var code = `braccio_wrist(braccio, logging_queue, Wrist['${x}'])\n`;
+        const x = block.getFieldValue('wrist');
+        const code = `braccio_wrist(braccio, logging_queue, Wrist['${x}'])\n`;
         return code;
     };
 
     python.pythonGenerator.forBlock['braccio_gripper'] = function (block, generator) {
-        var x = block.getFieldValue('gripper');
-        var code = `braccio_gripper(braccio, logging_queue, Gripper['${x}'])\n`;
+        const x = block.getFieldValue('gripper');
+        const code = `braccio_gripper(braccio, logging_queue, Gripper['${x}'])\n`;
         return code;
+    };
+}
+
+function defineDictionaryGenerators() {
+    python.pythonGenerator.forBlock['get_dict_property'] = function (block, generator) {
+        const dict = Blockly.Python.valueToCode(block, 'DICT', Blockly.Python.ORDER_ATOMIC) || "{}";
+        const key = Blockly.Python.valueToCode(block, 'KEY', Blockly.Python.ORDER_ATOMIC) || "''";
+
+        const code = `${dict}.get(${key})`;
+        return [code, Blockly.Python.ORDER_ATOMIC];
+    };
+}
+
+function defineRestAPIGenerators() {
+    python.pythonGenerator.forBlock['send_get_request'] = function (block, generator) {
+        const url = Blockly.Python.valueToCode(block, 'URL', Blockly.Python.ORDER_ATOMIC) || "''";
+        const code = `send_get_request(${url})`;
+
+        return [code, Blockly.Python.ORDER_NONE];
+    };
+
+    python.pythonGenerator.forBlock['send_post_request'] = function (block, generator) {
+        const url = Blockly.Python.valueToCode(block, 'URL', Blockly.Python.ORDER_ATOMIC) || "''";
+        const body = Blockly.Python.valueToCode(block, 'BODY', Blockly.Python.ORDER_ATOMIC) || "''";
+
+
+        const code = `send_post_request(${url}, ${body})`;
+        return [code, Blockly.Python.ORDER_NONE];
     };
 }
