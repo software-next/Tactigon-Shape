@@ -51,12 +51,18 @@ def save():
     url = get_from_request("url")
 
     if not username or not password:
-        flash("Cannot save Zion configurations. Username or password are required")
+        flash("Cannot save Zion configurations. Username or password are required", category="danger")
         return redirect(url_for("zion.index"))
     
     _url = url if url else ZionConfig.url
+
+    token = app.refresh_token(_url, username, password)
+
+    if not token:
+        flash("Cannot save Zion configurations. Username or password or url are incorrect", category="danger")
+        return redirect(url_for("zion.index"))
     
-    new_config = ZionConfig(username, password, _url)
+    new_config = ZionConfig(username, password, _url, token)
     app.save_config(new_config)
 
     flash("Zion configured succesfully", category="success")

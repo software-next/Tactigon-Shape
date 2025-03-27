@@ -67,22 +67,27 @@ class ZionInterface:
             "alarmSearchStatus": [(s.name, s.value) for s in AlarmSearchStatus],
         }
 
-    def do_post(self, url: str, payload: object):
-        headers = {
-            "Content-Type": "application/json",
-        }
-        return requests.post(
-            url,
-            json=payload,
-            headers=headers
-            )
+    # def do_post(self, url: str, payload: object):
+    #     headers = {
+    #         "Content-Type": "application/json",
+    #     }
+    #     return requests.post(
+    #         url,
+    #         json=payload,
+    #         headers=headers
+    #         )
 
     def do_get(self, url: str) -> Optional[dict]:
         if not self.config:
             return None
         
         if not self.token:
-            self.refresh_token()
+            token = self.refresh_token(self.config.url, self.config.username, self.config.password)
+            
+            if not token:
+                return None
+            
+            self.config.token = token
         
         headers = {
             "accept": "application/json",
@@ -95,32 +100,33 @@ class ZionInterface:
         )
 
         if res.status_code == 401:
-            self.refresh_token()
+            token = self.refresh_token(self.config.url, self.config.username, self.config.password)
+            
+            if not token:
+                return None
+            
+            self.config.token = token            
             return self.do_get(url)
 
         return res.json()
 
-    def refresh_token(self) -> bool:
-        if not self.config:
-            return False
-
+    def refresh_token(self, url, username: str, password: str) -> Optional[str]:
         headers = {
             "Content-Type": "application/json",
             "accept": "application/json",
         }
 
         res = requests.post(
-            f"{self.config.url}api/auth/login",
+            f"{url}api/auth/login",
             headers=headers,
-            json={"username": self.config.username, "password": self.config.password}
+            json={"username": username, "password": password}
         )
         
         if res.status_code != 200:
-            return False
+            return None
         
         data = res.json()
-        self.config.token = data["token"]
-        return True
+        return data["token"]
     
     def get_devices(self, size: int = 20, page: int = 0):
         if not self.config:
