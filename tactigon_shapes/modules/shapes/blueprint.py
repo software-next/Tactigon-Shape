@@ -6,9 +6,10 @@ from typing import List, Optional
 from flask import Blueprint, render_template, flash, redirect, url_for
 
 from .extension import ShapeConfig, Program
-from .utils import get_shapes_app
+from .manager import get_shapes_app
 
 from ..tskin.manager import get_tskin
+from ..zion.manager import get_zion_interface
 
 from ...config import app_config, check_config
 from ...models import ModelGesture
@@ -53,6 +54,11 @@ def index(program_id: Optional[str] = None):
 
     if app_config.TSKIN_VOICE and app_config.TSKIN_VOICE.voice_commands:
         blocks_config["speechs"] = _shapes.get_speech_block_config(app_config.TSKIN_VOICE.voice_commands)
+
+    zion = get_zion_interface()
+
+    if zion and zion.devices:
+        blocks_config["zion"] = zion.get_shape_blocks()
     
     state = _shapes.get_state(current_config.id) if current_config else None
 
@@ -62,7 +68,8 @@ def index(program_id: Optional[str] = None):
                            is_running=_shapes.is_running,
                            state=json.dumps(state),
                            shapes_config=_shapes.config,
-                           blocks_config=blocks_config)
+                           blocks_config=blocks_config,
+                           )
 
 @bp.route("/add", methods=["POST"])
 @check_config
@@ -105,8 +112,7 @@ def add():
     flash(f"Shape created.", category="success")
     return redirect(url_for("shapes.edit", program_id=new_config.id))
 
-
-@bp.route("/edit/<string:program_id>")
+@bp.route("/<string:program_id>/edit")
 @check_config
 def edit(program_id: str):
     _shapes = get_shapes_app()
@@ -136,6 +142,11 @@ def edit(program_id: str):
     if app_config.TSKIN_VOICE and app_config.TSKIN_VOICE.voice_commands:
         blocks_config["speechs"] = _shapes.get_speech_block_config(app_config.TSKIN_VOICE.voice_commands)
 
+    zion = get_zion_interface()
+
+    if zion and zion.devices:
+        blocks_config["zion"] = zion.get_shape_blocks()
+
     return render_template("shapes/edit.jinja",
                            current_config=current_config,
                            state=json.dumps(state),
@@ -143,7 +154,7 @@ def edit(program_id: str):
                            )
 
 
-@bp.route("/save/<string:program_id>/config", methods=["POST"])
+@bp.route("/<string:program_id>/save/config", methods=["POST"])
 @check_config
 def save_config(program_id: str):
     _shapes = get_shapes_app()
@@ -187,7 +198,7 @@ def save_config(program_id: str):
     return redirect(url_for("shapes.index", program_id=program_id))
 
 
-@bp.route("/clone/<string:program_id>/config", methods=["POST"])
+@bp.route("/<string:program_id>/clone/config", methods=["POST"])
 @check_config
 def clone_config(program_id: str):
     _shapes = get_shapes_app()
@@ -240,7 +251,7 @@ def clone_config(program_id: str):
     return redirect(url_for("shapes.edit", program_id=new_config.id))
 
 
-@bp.route("/save/<string:program_id>/program", methods=["POST"])
+@bp.route("/<string:program_id>/save/program", methods=["POST"])
 @check_config
 def save_program(program_id: str):
     _shapes = get_shapes_app()
@@ -276,7 +287,7 @@ def save_program(program_id: str):
     return redirect(url_for("shapes.index", program_id=program_id))
 
 
-@bp.route("/start/<string:program_id>")
+@bp.route("/<string:program_id>/start")
 @check_config
 def start(program_id: str):
     _shapes = get_shapes_app()
@@ -313,7 +324,7 @@ def start(program_id: str):
     return redirect(url_for("shapes.index", program_id=program_id))
 
 
-@bp.route("/stop/<string:program_id>")
+@bp.route("/<string:program_id>/stop")
 @check_config
 def stop(program_id: str):
     _shapes = get_shapes_app()
@@ -336,7 +347,7 @@ def stop(program_id: str):
     return redirect(url_for("shapes.index", program_id=program_id))
 
 
-@bp.route("/delete/<string:program_id>")
+@bp.route("/<string:program_id>/delete")
 @check_config
 def delete(program_id: str):
     _shapes = get_shapes_app()

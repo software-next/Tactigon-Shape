@@ -15,6 +15,7 @@ from flask import Flask
 from pynput.keyboard import Controller as KeyboardController
 
 from ..braccio.extension import BraccioInterface, Wrist, Gripper
+from ..zion.extension import ZionInterface
 from ..tskin.models import ModelGesture, TSkin, OneFingerGesture, TwoFingerGesture, TSpeechObject
 from ..tskin.manager import walk
 
@@ -132,12 +133,14 @@ class ShapeThread(ExtensionThread):
     _keyboard: KeyboardController
     _logging_queue: LoggingQueue
     _braccio_interface: Optional[BraccioInterface] = None
+    _zion_interface: Optional[ZionInterface] = None
 
-    def __init__(self, base_path: str, app: ShapeConfig, keyboard: KeyboardController, braccio: Optional[BraccioInterface], logging_queue: LoggingQueue, tskin: TSkin):
+    def __init__(self, base_path: str, app: ShapeConfig, keyboard: KeyboardController, braccio: Optional[BraccioInterface], zion: Optional[ZionInterface], logging_queue: LoggingQueue, tskin: TSkin):
         self._keyboard = keyboard
         self._tskin = tskin
         self._logging_queue = logging_queue
         self._braccio_interface = braccio
+        self._zion_interface = zion
 
         ExtensionThread.__init__(self)
 
@@ -150,6 +153,14 @@ class ShapeThread(ExtensionThread):
     @braccio_interface.setter
     def braccio_interface(self, braccio_interface: Optional[BraccioInterface]):
         self._braccio_interface = braccio_interface
+
+    @property
+    def zion_interface(self) -> Optional[ZionInterface]:
+        return self._zion_interface
+
+    @zion_interface.setter
+    def zion_interface(self, zion_interface: Optional[ZionInterface]):
+        self._zion_interface = zion_interface
 
     @staticmethod
     def debouce(tskin: Optional[TSkin]) -> bool:
@@ -172,7 +183,7 @@ class ShapeThread(ExtensionThread):
     def main(self):       
         actions: List[Tuple[ShapesPostAction, Any]] = []
         try:
-            self.module.app(self._tskin, self._keyboard, self.braccio_interface, actions, self._logging_queue)
+            self.module.app(self._tskin, self._keyboard, self.braccio_interface, self.zion_interface, actions, self._logging_queue)
         except Exception as e:
             self._logging_queue.error(str(e))
 
@@ -199,6 +210,7 @@ class ShapesApp(ExtensionApp):
     logging_queue: LoggingQueue
 
     _braccio_interface: Optional[BraccioInterface] = None
+    _zion_interface: Optional[ZionInterface] = None
 
     def __init__(self, config_path: str, flask_app: Optional[Flask] = None):
         self.config_file_path = path.join(config_path, "config.json")
@@ -229,6 +241,14 @@ class ShapesApp(ExtensionApp):
     @braccio_interface.setter
     def braccio_interface(self, braccio_interface: Optional[BraccioInterface]):
         self._braccio_interface = braccio_interface
+
+    @property
+    def zion_interface(self) -> Optional[ZionInterface]:
+        return self._zion_interface
+
+    @zion_interface.setter
+    def zion_interface(self, zion_interface: Optional[ZionInterface]):
+        self._zion_interface = zion_interface
 
     def get_log(self) -> Optional[DebugMessage]:
         try:
@@ -376,7 +396,7 @@ class ShapesApp(ExtensionApp):
 
                 self.current_id = _config.id
                 try:
-                    self.thread = ShapeThread(self.shapes_file_path, _config, self.keyboard, self.braccio_interface, self.logging_queue, tskin)
+                    self.thread = ShapeThread(self.shapes_file_path, _config, self.keyboard, self.braccio_interface, self.zion_interface, self.logging_queue, tskin)
                     self.thread.start()
                 except Exception as e:
                     self.current_id = None

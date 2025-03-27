@@ -6,11 +6,13 @@ function loadCustomBlocks(response) {
     const wristOptions = response ? response.wristOptions : []
     const gripperOptions = response ? response.gripperOptions : []
     const speechs = response ? response.speechs : []
+    const zion = response ? response.zion : []
 
     loadTSkinBlocks(gestures, taps);
     loadSpeechBlocks(speechs);
     loadKeyboardBlocks(funcKeys, modKeys);
     loadBraccioBlocks(wristOptions, gripperOptions);
+    loadZionBlocks(zion);
 
     Blockly.Blocks['get_dict_property'] = {
         init: function () {
@@ -34,58 +36,6 @@ function loadCustomBlocks(response) {
                 "tooltip": "Get the value for a key in a dictionary",
                 "helpUrl": "",
                 "inputsInline": true
-            });
-        }
-    };
-
-    Blockly.Blocks['send_get_request'] = {
-        init: function () {
-            this.jsonInit({
-                "type": "send_get_request",
-                "message0": "Send Get Request to %1 %2",
-                "args0": [
-                    {
-                        "type": "input_dummy"
-                    },
-                    {
-                        "type": "input_value",
-                        "name": "URL",
-                        "check": "String"
-                    }
-                ],
-                "output": "Dictionary",
-                "colour": '#6665DD',
-                "tooltip": "Send GET request and return the response",
-                "helpUrl": "",
-                "inputsInline": true
-            });
-        }
-    };
-
-    Blockly.Blocks['send_post_request'] = {
-        init: function () {
-            this.jsonInit({
-                "type": "send_post_request",
-                "message0": "Send Post Request to %1 URL %2 Body %3",
-                "args0": [
-                    {
-                        "type": "input_dummy"
-                    },
-                    {
-                        "type": "input_value",
-                        "name": "URL",
-                        "check": "String"
-                    },
-                    {
-                        "type": "input_value",
-                        "name": "BODY",
-                        "check": "String"
-                    }
-                ],
-                "output": "String",
-                "colour": '#6665DD',
-                "tooltip": "Send POST request and return the response",
-                "helpUrl": ""
             });
         }
     };
@@ -126,8 +76,7 @@ function loadCustomBlocks(response) {
                 "args0": [
                     {
                         "type": "input_value",
-                        "name": "TEXT",
-                        "check": "String"
+                        "name": "TEXT"
                     }
                 ],
                 "previousStatement": null,
@@ -287,7 +236,7 @@ function loadSpeechBlocks(speechs) {
                 "type": "tskin_listen",
                 "message0": message,
                 'args0': args,
-                "output": "List",
+                "output": "Array",
                 "colour": "#EB6152",
                 "tooltip": "Use Tactigon Skin to listen for commands",
                 "helpUrl": ""
@@ -618,6 +567,173 @@ function loadBraccioBlocks(wristOptions, gripperOptions) {
     };
 }
 
+function loadZionBlocks(zion){
+    Blockly.Blocks['device_list'] = {
+        init: function () {
+            this.jsonInit({
+                "type": "device_list",
+                "message0": "Device %1",
+                "args0": [
+                    {
+                        "type": "field_dropdown",
+                        "name": "device",
+                        "options": zion.devices
+                    }
+                ],
+                "output": "ZionDevice",
+                "colour": "#EB6152",
+                "tooltip": "Devices from Zion",
+                "helpUrl": ""
+            });
+        }
+    };
+
+    Blockly.Blocks['scope_list'] = {
+        init: function () {
+            this.jsonInit({
+                "type": "scope_list",
+                "message0": "Scope %1",
+                "args0": [
+                    {
+                        "type": "field_dropdown",
+                        "name": "scope",
+                        "options": zion.scopes
+                    }
+                ],
+                "output": "ZionScope",
+                "colour": "#EB6152",
+                "tooltip": "Attribute scope from Zion",
+                "helpUrl": ""
+            });
+        }
+    };
+
+    Blockly.Blocks['alarm_severity_list'] = {
+        init: function () {
+            this.jsonInit({
+                "type": "alarm_severity_list",
+                "message0": "Alarm severity %1",
+                "args0": [
+                    {
+                        "type": "field_dropdown",
+                        "name": "severity",
+                        "options": zion.alarmSeverity
+                    }
+                ],
+                "output": "ZionAlarmSeverity",
+                "colour": "#EB6152",
+                "tooltip": "Alarm severity from Zion",
+                "helpUrl": ""
+            });
+        }
+    };
+
+    Blockly.Blocks['alarm_search_status_list'] = {
+        init: function () {
+            this.jsonInit({
+                "type": "alarm_search_status_list",
+                "message0": "Alarm search status %1",
+                "args0": [
+                    {
+                        "type": "field_dropdown",
+                        "name": "search_status",
+                        "options": zion.alarmSearchStatus
+                    }
+                ],
+                "output": "ZionAlarmSeachStatus",
+                "colour": "#EB6152",
+                "tooltip": "Alarm search status from Zion",
+                "helpUrl": ""
+            });
+        }
+    };
+
+    Blockly.Blocks['device_last_telemetry'] = {
+        init: function () {
+            this.jsonInit({
+                "type": "device_last_telemetry",
+                "message0": "Get device last telemetry %1 (Optional) filter key %2",
+                "args0": [
+                    {
+                        "type": "input_value",
+                        "name": "device",
+                        "check": "ZionDevice"
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "keys",
+                        "check": "String"
+                    }
+                ],
+                "output": "Dictionary",
+                "colour": '#6665DD',
+                "tooltip": "Get last telemetry from device",
+                "helpUrl": ""
+            });
+        }
+    };
+
+    Blockly.Blocks['device_attr'] = {
+        init: function () {
+            this.jsonInit({
+                "type": "device_attr",
+                "message0": "Get device attribute %1 Scope %2 (Optional) filter key %3",
+                "args0": [
+                    {
+                        "type": "input_value",
+                        "name": "device",
+                        "check": "ZionDevice"
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "scope",
+                        "check": "ZionScope"
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "keys",
+                        "check": "String"
+                    }
+                ],
+                "output": "Dictionary",
+                "colour": '#6665DD',
+                "tooltip": "Get last telemetry from device",
+                "helpUrl": ""
+            });
+        }
+    };
+
+    Blockly.Blocks['device_alarm'] = {
+        init: function () {
+            this.jsonInit({
+                "type": "device_alarm",
+                "message0": "Get device alarm %1 Severity %2 Search status %3",
+                "args0": [
+                    {
+                        "type": "input_value",
+                        "name": "device",
+                        "check": "ZionDevice"
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "severity",
+                        "check": "ZionAlarmSeverity"
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "search_status",
+                        "check": "ZionAlarmSeachStatus"
+                    }
+                ],
+                "output": "Array",
+                "colour": '#6665DD',
+                "tooltip": "Get last telemetry from device",
+                "helpUrl": ""
+            });
+        }
+    };
+}
+
 function defineCustomGenerators() {
     Blockly.Python.INDENT = '    ';
 
@@ -630,55 +746,12 @@ import requests
 from datetime import datetime
 from tactigon_shapes.modules.shapes.extension import ShapesPostAction, LoggingQueue
 from tactigon_shapes.modules.braccio.extension import BraccioInterface, CommandStatus, Wrist, Gripper
+from tactigon_shapes.modules.zion.extension import ZionInterface, Scope, AlarmSearchStatus, AlarmSeverity
 from tactigon_shapes.modules.tskin.models import TSkin, Gesture, Touch, OneFingerGesture, TwoFingerGesture, HotWord, TSpeechObject, TSpeech
 from pynput.keyboard import Controller as KeyboardController, HotKey, KeyCode
-from typing import List, Optional, Union`;
+from typing import List, Optional, Union, Any`;
         
         var libs = `
-
-def send_get_request(url: str):
-    if not url:
-        return "Please enter a valid URL"
-
-    try:
-        response = requests.get(url, timeout=10)
-        response.raise_for_status() 
-
-        content_type = response.headers.get("Content-Type", "").lower()
-
-        if "application/json" in content_type:
-            return response.json()
-        else:
-            return {
-                "text": response.text
-            }
-
-    except requests.exceptions.RequestException as e:
-        return f"An error occurred: {e}"
-    except ValueError as e:
-        return f"Invalid JSON response: {e}"
-
-def send_post_request(url: str, body: str):
-    if not url:
-        return "Please enter a valid URL"
-
-    try:
-        response = requests.post(url,  json=body, timeout=10)
-        response.raise_for_status() 
-
-        content_type = response.headers.post("Content-Type", "").lower()
-
-        if "application/json" in content_type:
-            return response.json()
-        else:
-            return {
-                "text": response.text
-            }
-
-    except requests.exceptions.RequestException as e:
-        return f"An error occurred: {e}"
-    except ValueError as e:
-        return f"Invalid JSON response: {e}"
 
 def check_gesture(gesture: Optional[Gesture], gesture_to_find: str) -> bool:
     if not gesture:
@@ -798,7 +871,40 @@ def braccio_gripper(braccio: Optional[BraccioInterface], logging_queue: LoggingQ
     else:
         debug(logging_queue, "Braccio not configured")
 
-def debug(logging_queue: LoggingQueue, msg: str):
+def zion_device_last_telementry(zion: Optional[ZionInterface], device_id: str, keys: str) -> dict:
+    if not zion:
+        return {}
+    
+    data = zion.device_last_telemetry(device_id, keys)
+
+    if not data:
+        return {}
+
+    return data
+
+def zion_device_attr(zion: Optional[ZionInterface], device_id: str, scope: Scope, keys: str) -> dict:
+    if not zion:
+        return {}
+    
+    data = zion.device_attr(device_id, scope, keys)
+
+    if not data:
+        return {}
+
+    return data
+
+def zion_device_alarm(zion: Optional[ZionInterface], device_id: str, severity: AlarmSeverity, search_status: AlarmSearchStatus) -> List[dict]:
+    if not zion:
+        return []
+    
+    data = zion.device_alarm(device_id, severity, search_status)
+
+    if not data:
+        return []
+
+    return data
+
+def debug(logging_queue: LoggingQueue, msg: Optional[Any]):
     logging_queue.debug(str(msg))
 
 def reset_touch(tskin: TSkin):
@@ -818,7 +924,7 @@ def reset_touch(tskin: TSkin):
             return generator.INDENT + "global " + v.name;
         }).join('\n');
 
-        var code = libs + 'def app(tskin: TSkin, keyboard: KeyboardController, braccio: Optional[BraccioInterface], actions: List[ShapesPostAction], logging_queue: LoggingQueue):\n' + 
+        var code = libs + 'def app(tskin: TSkin, keyboard: KeyboardController, braccio: Optional[BraccioInterface], zion: Optional[ZionInterface], actions: List[ShapesPostAction], logging_queue: LoggingQueue):\n' + 
             variables + '\n' + "\n" +
             Blockly.Python.INDENT + "gesture = tskin.gesture\n" +
             Blockly.Python.INDENT + "touch = tskin.touch\n" +
@@ -838,7 +944,7 @@ def reset_touch(tskin: TSkin):
     defineKeyboardGenerators();
     defineBraccioGenerators();
     defineDictionaryGenerators();
-    defineRestAPIGenerators();
+    defineZionGenerators();
 }
 
 function defineTSkinGenerators(){
@@ -982,20 +1088,57 @@ function defineDictionaryGenerators() {
     };
 }
 
-function defineRestAPIGenerators() {
-    python.pythonGenerator.forBlock['send_get_request'] = function (block, generator) {
-        const url = Blockly.Python.valueToCode(block, 'URL', Blockly.Python.ORDER_ATOMIC) || "''";
-        const code = `send_get_request(${url})`;
-
-        return [code, Blockly.Python.ORDER_NONE];
+function defineZionGenerators() {
+    python.pythonGenerator.forBlock["device_list"] = function (block) {
+        var device = block.getFieldValue('device');
+        var code = `"${device}"`;
+        return [code, Blockly.Python.ORDER_ATOMIC];
     };
 
-    python.pythonGenerator.forBlock['send_post_request'] = function (block, generator) {
-        const url = Blockly.Python.valueToCode(block, 'URL', Blockly.Python.ORDER_ATOMIC) || "''";
-        const body = Blockly.Python.valueToCode(block, 'BODY', Blockly.Python.ORDER_ATOMIC) || "''";
+    python.pythonGenerator.forBlock["scope_list"] = function (block) {
+        var scope = block.getFieldValue('scope');
+        var code = `Scope("${scope}")`;
+        return [code, Blockly.Python.ORDER_ATOMIC];
+    };
 
+    python.pythonGenerator.forBlock["alarm_severity_list"] = function (block) {
+        var severity = block.getFieldValue('severity');
+        var code = `AlarmSeverity("${severity}")`;
+        return [code, Blockly.Python.ORDER_ATOMIC];
+    };
 
-        const code = `send_post_request(${url}, ${body})`;
-        return [code, Blockly.Python.ORDER_NONE];
+    python.pythonGenerator.forBlock["alarm_search_status_list"] = function (block) {
+        var search_status = block.getFieldValue('search_status');
+        var code = `AlarmSearchStatus("${search_status}")`;
+        return [code, Blockly.Python.ORDER_ATOMIC];
+    };
+
+    python.pythonGenerator.forBlock['device_last_telemetry'] = function (block, generator) {
+        var device = generator.valueToCode(block, 'device', python.Order.ATOMIC);
+        var keys = generator.valueToCode(block, 'keys', python.Order.ATOMIC);
+
+        var code = `zion_device_last_telementry(zion, ${device}, ${keys})`
+
+        return [code, Blockly.Python.ORDER_ATOMIC];
+    };
+
+    python.pythonGenerator.forBlock['device_attr'] = function (block, generator) {
+        var device = generator.valueToCode(block, 'device', python.Order.ATOMIC);
+        var scope = generator.valueToCode(block, 'scope', python.Order.ATOMIC);
+        var keys = generator.valueToCode(block, 'keys', python.Order.ATOMIC);
+
+        var code = `zion_device_attr(zion, ${device}, ${scope}, ${keys})`
+
+        return [code, Blockly.Python.ORDER_ATOMIC];
+    };
+
+    python.pythonGenerator.forBlock['device_alarm'] = function (block, generator) {
+        var device = generator.valueToCode(block, 'device', python.Order.ATOMIC);
+        var severity = generator.valueToCode(block, 'severity', python.Order.ATOMIC);
+        var search_status = generator.valueToCode(block, 'search_status', python.Order.ATOMIC);
+
+        var code = `zion_device_alarm(zion, ${device}, ${severity}, ${search_status})`
+
+        return [code, Blockly.Python.ORDER_ATOMIC];
     };
 }

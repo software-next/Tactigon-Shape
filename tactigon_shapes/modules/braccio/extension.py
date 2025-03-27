@@ -222,12 +222,8 @@ class BraccioInterface:
             self.init_app(app)
 
     def init_app(self, app: Flask):
-        app.extensions[self.name] = self
-
-    @property
-    def name(self) -> str:
-        return type(self).__name__
-    
+        app.extensions[BraccioInterface.__name__] = self
+   
     @property
     def configured(self) -> bool:
         return False if self.config is None else True
