@@ -5,7 +5,7 @@ from bleak import BleakScanner
 from flask import Blueprint, render_template, redirect, url_for, flash
 
 from .extension import BraccioConfig, BraccioInterface
-from .utils import get_braccio_interface
+from .manager import get_braccio_interface
 
 from ...config import check_config
 from ...utils.extensions import stop_apps

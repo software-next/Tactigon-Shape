@@ -332,25 +332,15 @@
             </block>
         </category>
         <category name="Dictionaries" colour="#000500">
-            <block type="get_dict_property"></block>
+            <block type="get_dict_property">
+                <value name="KEY">
+                    <shadow type="text">
+                        <field name="KEY"></field>
+                    </shadow>
+                </value>
+            </block>
         </category>
         <sep></sep>
-         <category name="Rest API" colour="#6665DD">
-            <block type="send_get_request">
-                <value name="URL">
-                    <shadow type="text">
-                        <field name="TEXT">https://catfact.ninja/fact</field>
-                    </shadow>
-                </value>
-            </block>
-            <block type="send_post_request">
-                <value name="URL">
-                    <shadow type="text">
-                        <field name="TEXT">https://catfact.ninja/fact</field>
-                    </shadow>
-                </value>
-            </block>
-        </category>
         <category name="Variables" colour="#a55b80" custom="VARIABLE"></category>
         <category name="Functions" colour="#995ba5" custom="PROCEDURE"></category>
         <sep></sep>
@@ -391,8 +381,8 @@
                 </value>
             </block>
         </category> 
-        <sep></sep>
         {% if braccio_config %}
+        <sep></sep>
         <category name="Braccio" colour="#cb6434">
             <block type="braccio_move">
                 <value name="x">
@@ -415,6 +405,64 @@
             <block type="braccio_wrist"></block>
         </category>
         {% endif %}
+        <sep></sep>
+        <category name="Zion API" colour="#6665DD">
+            <block type="device_list">
+            </block>
+            <block type="scope_list">
+            </block>
+            <block type="alarm_severity_list">
+            </block>
+            <block type="alarm_search_status_list">
+            </block>
+            <block type="device_last_telemetry">
+                <value name="device">
+                    <shadow type="device_list">
+                        <field name="device"></field>
+                    </shadow>
+                </value>
+                <value name="keys">
+                    <shadow type="text">
+                        <field name="keys"></field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="device_attr">
+                <value name="device">
+                    <shadow type="device_list">
+                        <field name="device"></field>
+                    </shadow>
+                </value>
+                <value name="scope">
+                    <shadow type="scope_list">
+                        <field name="scope"></field>
+                    </shadow>
+                </value>
+                <value name="keys">
+                    <shadow type="text">
+                        <field name="keys"></field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="device_alarm">
+                <value name="device">
+                    <shadow type="device_list">
+                        <field name="device"></field>
+                    </shadow>
+                </value>
+                <value name="severity">
+                    <shadow type="alarm_severity_list">
+                        <field name="severity"></field>
+                    </shadow>
+                </value>
+                <value name="search_status">
+                    <shadow type="alarm_search_status_list">
+                        <field name="search_status"></field>
+                    </shadow>
+                </value>
+            </block>
+        </category>
+        <sep></sep>
         <category name="Keyboard" colour="#c2c2c2">
             <block type="keyboard_press"></block>
             <block type="keyboard_key"></block>
