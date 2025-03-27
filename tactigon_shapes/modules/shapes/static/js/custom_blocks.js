@@ -742,7 +742,8 @@ function defineCustomGenerators() {
 # Shapes by Next Industries
 
 import time
-import requests
+import random
+from numbers import Number
 from datetime import datetime
 from tactigon_shapes.modules.shapes.extension import ShapesPostAction, LoggingQueue
 from tactigon_shapes.modules.braccio.extension import BraccioInterface, CommandStatus, Wrist, Gripper
