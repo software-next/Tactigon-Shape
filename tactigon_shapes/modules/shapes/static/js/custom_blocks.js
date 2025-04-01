@@ -732,6 +732,94 @@ function loadZionBlocks(zion){
             });
         }
     };
+
+    Blockly.Blocks['send_device_last_telemetry'] = {
+        init: function () {
+            this.jsonInit({
+                "type": "send_device_last_telemetry",
+                "message0": "Update %1 Key %2 Value %3",
+                "args0": [
+                    {
+                        "type": "input_value",
+                        "name": "device",
+                        "check": "ZionDevice"
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "key",
+                        "check": "String"
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "payload",
+                    }
+                ],
+                "output": "Boolean",
+                "colour": '#6665DD',
+                "tooltip": "Send telemetry to device",
+                "helpUrl": ""
+            });
+        }
+    };
+
+    Blockly.Blocks['send_device_attr'] = {
+        init: function () {
+            this.jsonInit({
+                "type": "send_device_last_telemetry",
+                "message0": "Update attribute of device %1 Scope %2 Key %3 Value %4",
+                "args0": [
+                    {
+                        "type": "input_value",
+                        "name": "device",
+                        "check": "ZionDevice"
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "scope",
+                        "check": "ZionScope"
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "key",
+                        "check": "String"
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "payload",
+                    }
+                ],
+                "output": "Boolean",
+                "colour": '#6665DD',
+                "tooltip": "Send attribute to device",
+                "helpUrl": ""
+            });
+        }
+    };
+    
+    Blockly.Blocks['send_device_alarm'] = {
+        init: function () {
+            this.jsonInit({
+                "type": "send_device_last_telemetry",
+                "message0": "Create or update alarm on device %1 alarm %2",
+                "args0": [
+                    {
+                        "type": "input_value",
+                        "name": "device",
+                        "check": "ZionDevice"
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "name",
+                        "check": "String"
+                    }
+                ],
+                "output": "Boolean",
+                "colour": '#6665DD',
+                "tooltip": "Create or update alarm on device",
+                "helpUrl": ""
+            });
+        }
+    };
 }
 
 function defineCustomGenerators() {
@@ -872,7 +960,7 @@ def braccio_gripper(braccio: Optional[BraccioInterface], logging_queue: LoggingQ
     else:
         debug(logging_queue, "Braccio not configured")
 
-def zion_device_last_telementry(zion: Optional[ZionInterface], device_id: str, keys: str) -> dict:
+def zion_device_last_telemetry(zion: Optional[ZionInterface], device_id: str, keys: str) -> dict:
     if not zion:
         return {}
     
@@ -904,6 +992,30 @@ def zion_device_alarm(zion: Optional[ZionInterface], device_id: str, severity: A
         return []
 
     return data
+
+def zion_send_device_last_telemetry(zion: Optional[ZionInterface], device_id: str, key: str, data) -> bool:
+    if not zion:
+        return False
+
+    payload = {}
+    payload[key] = data
+
+    return zion.send_device_last_telemetry(device_id, payload)
+
+def zion_send_device_attr(zion: Optional[ZionInterface], device_id: str, scope: Scope, key: str, data) -> bool:
+    if not zion:
+        return False
+
+    payload = {}
+    payload[key] = data
+
+    return zion.send_device_attr(device_id, payload, scope)    
+
+def zion_send_device_alarm(zion: Optional[ZionInterface], device_id: str, name: str) -> bool:
+    if not zion:
+        return False
+
+    return zion.upsert_device_alarm(device_id, name, name) 
 
 def debug(logging_queue: LoggingQueue, msg: Optional[Any]):
     logging_queue.debug(str(msg))
@@ -993,7 +1105,6 @@ function defineSpeechGenerators(){
     };
 
     python.pythonGenerator.forBlock['tskin_record'] = function (block, generator) {
-        debugger;
         let filename = generator.valueToCode(block, 'filename', python.Order.ATOMIC);
         let seconds = generator.valueToCode(block, 'seconds', python.Order.ATOMIC);
 
@@ -1118,10 +1229,32 @@ function defineZionGenerators() {
         var device = generator.valueToCode(block, 'device', python.Order.ATOMIC);
         var keys = generator.valueToCode(block, 'keys', python.Order.ATOMIC);
 
-        var code = `zion_device_last_telementry(zion, ${device}, ${keys})`
+        var code = `zion_device_last_telemetry(zion, ${device}, ${keys})`
 
         return [code, Blockly.Python.ORDER_ATOMIC];
     };
+
+    python.pythonGenerator.forBlock['send_device_last_telemetry'] = function (block, generator) {
+        const device = generator.valueToCode(block, 'device', python.Order.ATOMIC);
+        const key = generator.valueToCode(block, 'key', python.Order.ATOMIC);
+        const payload = generator.valueToCode(block, 'payload', python.Order.ATOMIC);
+
+        const code = `zion_send_device_last_telemetry(zion, ${device}, ${key}, ${payload})`
+
+        return [code, Blockly.Python.ORDER_ATOMIC];
+    };
+
+    python.pythonGenerator.forBlock['send_device_attr'] = function (block, generator) {
+        const device = generator.valueToCode(block, 'device', python.Order.ATOMIC);
+        const scope = generator.valueToCode(block, 'scope', python.Order.ATOMIC);
+        const key = generator.valueToCode(block, 'key', python.Order.ATOMIC);
+        const payload = generator.valueToCode(block, 'payload', python.Order.ATOMIC);
+
+        const code = `zion_send_device_attr(zion, ${device}, ${scope}, ${key}, ${payload})`
+
+        return [code, Blockly.Python.ORDER_ATOMIC];
+    };
+
 
     python.pythonGenerator.forBlock['device_attr'] = function (block, generator) {
         var device = generator.valueToCode(block, 'device', python.Order.ATOMIC);
@@ -1139,6 +1272,15 @@ function defineZionGenerators() {
         var search_status = generator.valueToCode(block, 'search_status', python.Order.ATOMIC);
 
         var code = `zion_device_alarm(zion, ${device}, ${severity}, ${search_status})`
+
+        return [code, Blockly.Python.ORDER_ATOMIC];
+    };
+    
+    python.pythonGenerator.forBlock['send_device_alarm'] = function (block, generator) {
+        var device = generator.valueToCode(block, 'device', python.Order.ATOMIC);
+        var name = generator.valueToCode(block, 'name', python.Order.ATOMIC);
+
+        var code = `zion_send_device_alarm(zion, ${device}, ${name})`
 
         return [code, Blockly.Python.ORDER_ATOMIC];
     };

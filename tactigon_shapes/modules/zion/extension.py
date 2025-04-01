@@ -5,7 +5,9 @@ import requests
 from flask import Flask
 from typing import Optional, List
 
-from .models import ZionConfig, Device, Scope, AlarmSearchStatus, AlarmSeverity
+from .models import AlarmStatus, ZionConfig, Device, Scope, AlarmSearchStatus, AlarmSeverity
+
+APPLICATION_JSON = 'application/json'
 
 class ZionInterface:
     config_file_path: str
@@ -35,6 +37,11 @@ class ZionInterface:
     def token(self) -> Optional[str]:
         return self.config.token if self.config else None
     
+    @token.setter
+    def token(self, token: str):
+        if self.config:
+            self.config.token = token
+    
     def load_config(self):
         if os.path.exists(self.config_file_path) and os.path.exists(self.config_file):
             with open(self.config_file, "r") as f:
@@ -61,23 +68,13 @@ class ZionInterface:
     
     def get_shape_blocks(self):
         return {
-            "devices": [(d.name, d.id) for d in self.devices],
+            "devices": [(d.name, d.id.id) for d in self.devices],
             "scopes": [(s.name, s.value) for s in Scope],
             "alarmSeverity": [(s.name, s.value) for s in AlarmSeverity],
             "alarmSearchStatus": [(s.name, s.value) for s in AlarmSearchStatus],
         }
 
-    # def do_post(self, url: str, payload: object):
-    #     headers = {
-    #         "Content-Type": "application/json",
-    #     }
-    #     return requests.post(
-    #         url,
-    #         json=payload,
-    #         headers=headers
-    #         )
-
-    def do_get(self, url: str) -> Optional[dict]:
+    def do_post(self, url: str, payload: object) -> Optional[requests.Response]:
         if not self.config:
             return None
         
@@ -87,10 +84,44 @@ class ZionInterface:
             if not token:
                 return None
             
-            self.config.token = token
+            self.token = token
+
+        headers = {
+            "accept": APPLICATION_JSON,
+            "X-Authorization": f"Bearer {self.token}"
+        }
+
+        res = requests.post(
+            url,
+            json=payload,
+            headers=headers
+            )
+        
+        if res.status_code == 401:
+            token = self.refresh_token(self.config.url, self.config.username, self.config.password)
+            
+            if not token:
+                return None
+            
+            self.token = token            
+            return self.do_post(url, payload)
+        
+        return res
+
+    def do_get(self, url: str) -> Optional[dict]:
+        if not self.config:
+            return None
+
+        if not self.token:
+            token = self.refresh_token(self.config.url, self.config.username, self.config.password)
+            
+            if not token:
+                return None
+            
+            self.token = token
         
         headers = {
-            "accept": "application/json",
+            "accept": APPLICATION_JSON,
             "X-Authorization": f"Bearer {self.token}"
         }
 
@@ -105,15 +136,15 @@ class ZionInterface:
             if not token:
                 return None
             
-            self.config.token = token            
+            self.token = token            
             return self.do_get(url)
 
         return res.json()
 
     def refresh_token(self, url, username: str, password: str) -> Optional[str]:
         headers = {
-            "Content-Type": "application/json",
-            "accept": "application/json",
+            "Content-Type": APPLICATION_JSON,
+            "accept": APPLICATION_JSON,
         }
 
         res = requests.post(
@@ -141,7 +172,7 @@ class ZionInterface:
 
         for device in res["data"]:
             self.devices.append(
-                Device(device["id"]["id"], device["name"])
+                Device.FromZION(device)
             )
 
         if res["hasNext"]:
@@ -208,3 +239,53 @@ class ZionInterface:
                 ret.extend(others)
 
         return ret
+      
+    def send_device_last_telemetry(self, device_id: str, payload: dict) -> bool:
+        if not self.config:
+            return False
+        
+        url = f"{self.config.url}api/plugins/telemetry/DEVICE/{device_id}/timeseries/ANY?scope=ANY"
+
+        res = self.do_post(url, payload)
+
+        if not res:
+            return False
+        
+        return res.status_code == 200
+    
+    def send_device_attr(self, device_id: str, payload: dict, scope: Scope = Scope.SERVER) -> bool:
+        if not self.config:
+            return False
+        
+        url = f"{self.config.url}api/plugins/telemetry/{device_id}/{scope.value}"
+
+        res = self.do_post(url, payload)
+
+        if not res:
+            return False
+        
+        return res.status_code == 200
+    
+    def upsert_device_alarm(self, device_id: str, alarm_name: str, alarm_type: str, severity: AlarmSeverity = AlarmSeverity.CRITICAL, status: AlarmStatus = AlarmStatus.CLEARED_UNACK) -> bool:
+        if not self.config:
+            return False
+        
+        url = f"{self.config.url}api/alarm"
+
+        device = list(filter(lambda d: d.id.id == device_id, self.devices))
+
+        if not device:
+            return False
+        
+        payload = device[0].to_alarm()
+        payload["name"] = alarm_name
+        payload["type"] = alarm_type
+        payload["severity"] = severity.value
+        payload["status"] = status.value
+
+        res = self.do_post(url, payload)
+
+        if not res:
+            return False
+
+        return False
