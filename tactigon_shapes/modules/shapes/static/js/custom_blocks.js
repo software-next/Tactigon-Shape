@@ -14,130 +14,6 @@ function loadCustomBlocks(response) {
     loadBraccioBlocks(wristOptions, gripperOptions);
     loadZionBlocks(zion);
 
-    Blockly.Blocks['create_empty_dict'] = {
-        init: function () {
-            this.jsonInit({
-                "type": "create_empty_dict",
-                "message0": "Create empty dictionary",
-                "output": "Dictionary",
-                "colour": '#000500',
-                "tooltip": "Creates an empty dictionary (dict).",
-                "helpUrl": ""
-            });
-        }
-    };
-    
-    Blockly.Blocks['create_dict_with'] = {
-        init: function () {
-            this.jsonInit({
-                "type": "create_dict_with",
-                "message0": "Create dictionary with %1",
-                "args0": [
-                    {
-                        "type": "input_value",
-                        "name": "PAIRS",
-                        "check": "Array"
-                    }
-                ],
-                "output": "Dictionary",
-                "colour": '#000500',
-                "tooltip": "Creates a dict with key-value pairs.",
-                "helpUrl": ""
-            });
-        }
-    };
-    
-    Blockly.Blocks['size_of_dict'] = {
-        init: function () {
-            this.jsonInit({
-                "type": "size_of_dict",
-                "message0": "Size of %1",
-                "args0": [
-                    {
-                        "type": "input_value",
-                        "name": "MAP",
-                        "check": "Dictionary"
-                    }
-                ],
-                "output": "Number",
-                "colour": '#000500',
-                "tooltip": "Gets the number of entries in a dict.",
-                "helpUrl": ""
-            });
-        }
-    };
-    
-    Blockly.Blocks['is_empty_dict'] = {
-        init: function () {
-            this.jsonInit({
-                "type": "is_empty_dict",
-                "message0": "is empty %1",
-                "args0": [
-                    {
-                        "type": "input_value",
-                        "name": "MAP",
-                        "check": "Dictionary"
-                    }
-                ],
-                "output": "Boolean",
-                "colour": '#000500',
-                "tooltip": "Checks if a dict is empty.",
-                "helpUrl": ""
-            });
-        }
-    };
-    
-    Blockly.Blocks['set_dict_property'] = {
-        init: function () {
-            this.jsonInit({
-                "type": "set_dict_property",
-                "message0": "In dictionary %1 set key %2 as %3",
-                "args0": [
-                    {
-                        "type": "input_value",
-                        "name": "DICT",
-                        "check": "Dictionary"
-                    },
-                    {
-                        "type": "input_value",
-                        "name": "KEY",
-                        "check": "String"
-                    },
-                    {
-                        "type": "input_value",
-                        "name": "VALUE"
-                    }
-                ],
-                "previousStatement": null,
-                "nextStatement": null,
-                "colour": '#000500',
-                "tooltip": "Sets a key-value pair in a dictionary.",
-                "helpUrl": "",
-                "inputsInline": true
-            });
-        }
-    };
-    
-    Blockly.Blocks['get_keys_of_dict'] = {
-        init: function () {
-            this.jsonInit({
-                "type": "get_keys_of_dict",
-                "message0": "Get keys of %1",
-                "args0": [
-                    {
-                        "type": "input_value",
-                        "name": "MAP",
-                        "check": "Dictionary"
-                    }
-                ],
-                "output": "Array",
-                "colour": '#000500',
-                "tooltip": "Gets all the keys from a dictionary.",
-                "helpUrl": ""
-            });
-        }
-    };
-
     Blockly.Blocks['get_dict_property'] = {
         init: function () {
             this.jsonInit({
@@ -856,6 +732,57 @@ function loadZionBlocks(zion){
             });
         }
     };
+
+    
+    Blockly.Blocks['send_device_last_telemetry'] = {
+        init: function () {
+            this.jsonInit({
+                "type": "send_device_last_telemetry",
+                "message0": "Send device last telemetry %1 payload %2",
+                "args0": [
+                    {
+                        "type": "input_value",
+                        "name": "device",
+                        "check": "ZionDevice"
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "data",
+                        "check": "Dictionary"
+                    }
+                ],
+                "output": "Dictionary",
+                "colour": '#6665DD',
+                "tooltip": "Send device last telemetry",
+                "helpUrl": ""
+            });
+        }
+    };
+
+    Blockly.Blocks['send_device_attr'] = {
+        init: function () {
+            this.jsonInit({
+                "type": "send_device_attr",
+                "message0": "Send device attribute %1 payload %2",
+                "args0": [
+                    {
+                        "type": "input_value",
+                        "name": "device",
+                        "check": "ZionDevice"
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "data",
+                        "check": "Dictionary"
+                    }
+                ],
+                "output": "Dictionary",
+                "colour": '#6665DD',
+                "tooltip": "Send attribute to specific zion device",
+                "helpUrl": ""
+            });
+        }
+    };
 }
 
 function defineCustomGenerators() {
@@ -1298,6 +1225,24 @@ function defineZionGenerators() {
         var search_status = generator.valueToCode(block, 'search_status', python.Order.ATOMIC);
 
         var code = `zion_device_alarm(zion, ${device}, ${severity}, ${search_status})`
+
+        return [code, Blockly.Python.ORDER_ATOMIC];
+    };
+
+    python.pythonGenerator.forBlock['send_device_last_telemetry'] = function (block, generator) {
+        const device = generator.valueToCode(block, 'device', python.Order.ATOMIC);
+        const payload = generator.valueToCode(block, 'data', python.Order.ATOMIC);
+
+        const code = `zion_send_device_last_telemetry(zion, ${device}, ${payload})`
+
+        return [code, Blockly.Python.ORDER_ATOMIC];
+    };
+
+    python.pythonGenerator.forBlock['send_device_attr'] = function (block, generator) {
+        const device = generator.valueToCode(block, 'device', python.Order.ATOMIC);
+        const payload = generator.valueToCode(block, 'data', python.Order.ATOMIC);
+
+        const code = `zion_send_device_attr(zion, ${device}, ${payload})`
 
         return [code, Blockly.Python.ORDER_ATOMIC];
     };
