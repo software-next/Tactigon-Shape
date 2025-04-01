@@ -8,6 +8,9 @@ class Scope(Enum):
     CLIENT = "CLIENT_SCOPE"
     SHARED = "SHARED_SCOPE"
 
+class AlarmStatus(Enum):
+    CLEARED_UNACK = "CLEARED_UNACK"
+
 class AlarmSearchStatus(Enum):
     ACK = "ACK"
     ACTIVE = "ACTIVE"
@@ -20,9 +23,43 @@ class AlarmSeverity(Enum):
     CRITICAL = "CRITICAL"
 
 @dataclass
-class Device:
+class Id:
+    entityType: str
     id: str
+
+@dataclass
+class Device:
+    id: Id
     name: str
+    type: str
+    tenantId: Id
+    customerId: Id
+
+    @classmethod
+    def FromZION(cls, json):
+        return cls(
+            Id(json["id"]["entityType"],json["id"]["id"]),
+            json["name"],
+            json["type"],
+            Id(json["tenantId"]["entityType"],json["tenantId"]["id"]),
+            Id(json["customerId"]["entityType"],json["customerId"]["id"]),
+        )
+
+    def to_alarm(self) -> dict:
+        return {
+            "tenantId": {
+                "entityType": self.tenantId.entityType,
+                "id": self.tenantId.id
+            },
+            "customerId": {
+                "entityType": self.customerId.entityType,
+                "id": self.customerId.id
+            },
+            "originator": {
+                "entityType": self.id.entityType,
+                "id": self.id.id
+            }
+        }
 
 @dataclass
 class ZionConfig:

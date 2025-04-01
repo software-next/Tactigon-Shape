@@ -1,7 +1,8 @@
 # Shapes by Next Industries
 
 import time
-import requests
+import random
+from numbers import Number
 from datetime import datetime
 from tactigon_shapes.modules.shapes.extension import ShapesPostAction, LoggingQueue
 from tactigon_shapes.modules.braccio.extension import BraccioInterface, CommandStatus, Wrist, Gripper
@@ -133,7 +134,7 @@ def braccio_gripper(braccio: Optional[BraccioInterface], logging_queue: LoggingQ
     else:
         debug(logging_queue, "Braccio not configured")
 
-def zion_device_last_telementry(zion: Optional[ZionInterface], device_id: str, keys: str) -> dict:
+def zion_device_last_telemetry(zion: Optional[ZionInterface], device_id: str, keys: str) -> dict:
     if not zion:
         return {}
 
@@ -166,6 +167,30 @@ def zion_device_alarm(zion: Optional[ZionInterface], device_id: str, severity: A
 
     return data
 
+def zion_send_device_last_telemetry(zion: Optional[ZionInterface], device_id: str, key: str, data) -> bool:
+    if not zion:
+        return False
+
+    payload = {}
+    payload[key] = data
+
+    return zion.send_device_last_telemetry(device_id, payload)
+
+def zion_send_device_attr(zion: Optional[ZionInterface], device_id: str, scope: Scope, key: str, data) -> bool:
+    if not zion:
+        return False
+
+    payload = {}
+    payload[key] = data
+
+    return zion.send_device_attr(device_id, payload, scope)
+
+def zion_send_device_alarm(zion: Optional[ZionInterface], device_id: str, name: str) -> bool:
+    if not zion:
+        return False
+
+    return zion.upsert_device_alarm(device_id, name, name)
+
 def debug(logging_queue: LoggingQueue, msg: Optional[Any]):
     logging_queue.debug(str(msg))
 
@@ -176,10 +201,12 @@ def reset_touch(tskin: TSkin):
 # This is the main function that runs your code. Any
 # code blocks you add to this section will be executed.
 def app(tskin: TSkin, keyboard: KeyboardController, braccio: Optional[BraccioInterface], zion: Optional[ZionInterface], actions: List[ShapesPostAction], logging_queue: LoggingQueue):
-    global list
+
 
     gesture = tskin.gesture
     touch = tskin.touch
-    debug(logging_queue, zion_device_last_telementry(zion, "fb906550-4f5a-11ef-850d-a7a8b5a94c63", 'temperature').get('temperature'))
-    debug(logging_queue, zion_device_attr(zion, "d1dc2a80-dec3-11ee-82e8-99e13cb12b3b", Scope("SERVER_SCOPE"), '').get('force_stop'))
-    debug(logging_queue, (len(zion_device_alarm(zion, "0da7fff0-d70b-11ee-82e8-99e13cb12b3b", AlarmSeverity("CRITICAL"), AlarmSearchStatus("ACK")))))
+    debug(logging_queue, zion_device_last_telemetry(zion, "fb906550-4f5a-11ef-850d-a7a8b5a94c63", ''))
+    debug(logging_queue, zion_device_attr(zion, "fb906550-4f5a-11ef-850d-a7a8b5a94c63", Scope("SERVER_SCOPE"), 'alarm_threshold'))
+    debug(logging_queue, zion_device_alarm(zion, "fb906550-4f5a-11ef-850d-a7a8b5a94c63", AlarmSeverity("CRITICAL"), AlarmSearchStatus("ACTIVE")))
+    debug(logging_queue, zion_send_device_last_telemetry(zion, "fb906550-4f5a-11ef-850d-a7a8b5a94c63", 'temperature_zion', 23.5))
+    debug(logging_queue, zion_send_device_attr(zion, "fb906550-4f5a-11ef-850d-a7a8b5a94c63", Scope("SERVER_SCOPE"), 'automatic', True))
