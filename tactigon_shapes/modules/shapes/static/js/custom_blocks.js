@@ -1111,41 +1111,6 @@ function defineDictionaryGenerators() {
         const code = `${dict}.get(${key})`;
         return [code, Blockly.Python.ORDER_ATOMIC];
     };
-
-    python.pythonGenerator.forBlock['create_empty_dict'] = function (block, generator) {
-        return ['{}', Blockly.Python.ORDER_ATOMIC];
-    };
-
-    python.pythonGenerator.forBlock['create_dict_with'] = function (block, generator) {
-        const pairs = Blockly.Python.valueToCode(block, 'PAIRS', Blockly.Python.ORDER_ATOMIC) || '[]';
-        const code = `dict(${pairs})`;
-        return [code, Blockly.Python.ORDER_ATOMIC];
-    };
-
-    python.pythonGenerator.forBlock['size_of_dict'] = function(block) {
-        const dict = Blockly.Python.valueToCode(block, 'MAP', Blockly.Python.ORDER_ATOMIC) || '{}';
-        const code = `len(${dict})`;
-        return [code, Blockly.Python.ORDER_ATOMIC];
-    };
-
-    python.pythonGenerator.forBlock['is_empty_dict'] = function(block) {
-        const dict = Blockly.Python.valueToCode(block, 'MAP', Blockly.Python.ORDER_ATOMIC) || '{}';
-        const code = `len(${dict}) == 0`;
-        return [code, Blockly.Python.ORDER_ATOMIC];
-    };
-
-    python.pythonGenerator.forBlock['set_dict_property'] = function(block) {
-        const dict = Blockly.Python.valueToCode(block, 'DICT', Blockly.Python.ORDER_ATOMIC) || '{}';
-        const key = Blockly.Python.valueToCode(block, 'KEY', Blockly.Python.ORDER_ATOMIC) || "''";
-        const value = Blockly.Python.valueToCode(block, 'VALUE', Blockly.Python.ORDER_ATOMIC) || "None";
-        return `${dict}[${key}] = ${value}\n`;
-    };
-
-    python.pythonGenerator.forBlock['get_keys_of_dict'] = function(block) {
-        const dict = Blockly.Python.valueToCode(block, 'MAP', Blockly.Python.ORDER_ATOMIC) || '{}';
-        const code = `list(${dict}.keys())`;
-        return [code, Blockly.Python.ORDER_ATOMIC];
-    };
 }
 
 function defineZionGenerators() {
